@@ -1,3 +1,4 @@
 falcon
 pony
 gunicorn
+psycopg2
