@@ -49,7 +49,7 @@ class AccountLoginResource(object):
         if not user.password == data['password']:
             raise falcon.HTTPForbidden("Forbidden", "The entered password is not correct.")
         token = jwt.encode({
-            'exp': datetime.utcnow() + TOKEN_EXPIRATION,
+            'exp': None if 'remember' in data and data['remember'] == True else datetime.utcnow() + TOKEN_EXPIRATION,
             'iss': TOKEN_ISSUER,
             'aud': TOKEN_AUDIENCE,
             'iat': datetime.utcnow(),
