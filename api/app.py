@@ -17,6 +17,7 @@ class IndexResource(object):
         resp.status = falcon.HTTP_200
         resp.body = dumps({'message': "Welcome to the API!"})
 
+
 class AccountCreateResource(object):
     @db_session
     def on_post(self, req, resp):
@@ -56,6 +57,7 @@ class AccountLoginResource(object):
             'uid': user.id
         }, SECRET)
         resp.body = dumps({'message': "Logged in succeffully.", 'token': token})
+
 
 class AccountResource(object):
     @falcon.before(validate_token)
