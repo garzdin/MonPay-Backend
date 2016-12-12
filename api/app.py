@@ -58,8 +58,8 @@ class AccountLoginResource(object):
         resp.body = dumps({'message': "Logged in succeffully.", 'token': token})
 
 class AccountResource(object):
-    @db_session
     @falcon.before(validate_token)
+    @db_session
     def on_get(self, req, resp):
         user = User.get(id=req.uid)
         resp.body = dumps({
