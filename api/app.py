@@ -1,7 +1,7 @@
 from json import load, dumps
 from datetime import datetime, timedelta
-import jwt
-import falcon
+from jwt import encode
+from falcon import *
 from middleware import validate_token
 from models import *
 from settings import *
@@ -49,13 +49,15 @@ class AccountLoginResource(object):
             raise falcon.HTTPNotFound("Not Found", "The user with the specified email was not found.")
         if not user.password == data['password']:
             raise falcon.HTTPForbidden("Forbidden", "The entered password is not correct.")
-        token = jwt.encode({
-            'exp': None if 'remember' in data and data['remember'] == True else datetime.utcnow() + TOKEN_EXPIRATION,
+        token_data = {
             'iss': TOKEN_ISSUER,
             'aud': TOKEN_AUDIENCE,
             'iat': datetime.utcnow(),
             'uid': user.id
-        }, SECRET)
+        }
+        if not 'remember' in data:
+            token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
+        token = encode(token_data, SECRET)
         resp.body = dumps({'message': "Logged in succeffully.", 'token': token})
 
 
@@ -63,13 +65,16 @@ class AccountResource(object):
     @falcon.before(validate_token)
     @db_session
     def on_get(self, req, resp):
-        user = User.get(id=req.uid)
-        resp.body = dumps({
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'registered_on': str(user.created_on)
-        })
+        if req.uid:
+            user = User.get(id=req.uid)
+            resp.body = dumps({
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'registered_on': str(user.created_on)
+            })
+        else:
+            resp.body = dumps({'message': req.decode_error})
 
 
 app = falcon.API()
