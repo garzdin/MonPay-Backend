@@ -4,6 +4,7 @@ from models import db
 from settings import DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME
 from controllers import *
 
+__all__ = ['app']
 
 db.bind('postgres', user=DATABASE_USER, password=DATABASE_PASSWORD, host=DATABASE_HOST, database=DATABASE_NAME)
 db.generate_mapping(create_tables=True)
