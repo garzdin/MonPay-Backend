@@ -2,9 +2,9 @@ from json import load, dumps
 from datetime import datetime
 from jwt import encode
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
-from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
-from middlewares import validate_token
-from models import db_session, User
+from ..settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
+from ..middlewares import validate_token
+from ..models import db_session, User
 
 __all__ = ['AccountCreateResource', 'AccountLoginResource', 'AccountResource']
 

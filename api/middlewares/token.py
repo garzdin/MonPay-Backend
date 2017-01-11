@@ -1,7 +1,7 @@
 from json import dumps
 from jwt import decode, ExpiredSignatureError, DecodeError
 from falcon import HTTPBadRequest
-from settings import SECRET, TOKEN_AUDIENCE
+from ..settings import SECRET, TOKEN_AUDIENCE
 
 __all__ = ['validate_token']
 
