@@ -6,13 +6,16 @@ from ..settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from ..middlewares import validate_token
 from ..models import db_session, User
 
-__all__ = ['AccountCreateResource', 'AccountLoginResource', 'AccountResource']
+__all__ = ['AccountCreateResource', 'AccountLoginResource', 'AccountResetResource', 'AccountResource']
 
 class AccountCreateResource(object):
     @db_session
     def on_post(self, req, resp):
         """Handles POST requests"""
-        data = load(req.bounded_stream)
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request", code=1)
         if not 'email' in data or not 'password' in data:
             raise HTTPBadRequest(description="Email and password required", code=1)
         user = User.select(lambda u: u.email==data['email'])
@@ -58,6 +61,24 @@ class AccountLoginResource(object):
             "token": token
         })
 
+
+class AccountResetResource(object):
+    @db_session
+    def on_post(self, req, resp):
+        """Handle POST requests"""
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request", code=1)
+        if not 'email' in data:
+            raise HTTPBadRequest(description="Email required", code=1)
+        user = User.get(email=data['email'])
+        if not user:
+            raise HTTPNotFound(description="Email not found", code=1)
+        resp.body = dumps({
+            "message": "Email sent",
+            "status": "success"
+        })
 
 class AccountResource(object):
     @before(validate_token)
