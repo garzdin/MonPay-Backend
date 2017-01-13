@@ -6,7 +6,9 @@ from ..settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from ..middlewares import validate_token
 from ..models import db_session, User
 
-__all__ = ['AccountCreateResource', 'AccountLoginResource', 'AccountResetResource', 'AccountResource']
+__all__ = ['AccountCreateResource', 'AccountLoginResource',
+           'AccountResetResource', 'AccountResource']
+
 
 class AccountCreateResource(object):
     @db_session
@@ -18,7 +20,7 @@ class AccountCreateResource(object):
             raise HTTPBadRequest(description="Invalid request", code=1)
         if not 'email' in data or not 'password' in data:
             raise HTTPBadRequest(description="Email and password required", code=1)
-        user = User.select(lambda u: u.email==data['email'])
+        user = User.select(lambda u: u.email == data['email'])
         if user:
             raise HTTPConflict(description="Email already exists", code=1)
         user = User(
@@ -27,9 +29,7 @@ class AccountCreateResource(object):
             email=data['email'],
             password=data['password']
         )
-        resp.body = dumps({
-            "description": "User created succeffully",
-        })
+        resp.body = dumps({"description": "User created succeffully", })
 
 
 class AccountLoginResource(object):
@@ -56,10 +56,7 @@ class AccountLoginResource(object):
         if not 'remember' in data:
             token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
         token = encode(token_data, SECRET)
-        resp.body = dumps({
-            "message": "Logged in succeffully",
-            "token": token
-        })
+        resp.body = dumps({"message": "Logged in succeffully", "token": token})
 
 
 class AccountResetResource(object):
@@ -75,10 +72,8 @@ class AccountResetResource(object):
         user = User.get(email=data['email'])
         if not user:
             raise HTTPNotFound(description="Email not found", code=1)
-        resp.body = dumps({
-            "message": "Email sent",
-            "status": "success"
-        })
+        resp.body = dumps({"message": "Email sent", "status": "success"})
+
 
 class AccountResource(object):
     @before(validate_token)

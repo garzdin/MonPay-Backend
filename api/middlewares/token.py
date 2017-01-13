@@ -5,6 +5,7 @@ from ..settings import SECRET, TOKEN_AUDIENCE
 
 __all__ = ['validate_token']
 
+
 def validate_token(req, resp, resource, param):
     token = req.get_header('Authorization')
     if not token:
