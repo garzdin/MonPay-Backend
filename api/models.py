@@ -9,6 +9,7 @@ db = Database()
 
 class User(db.Entity):
     id = PrimaryKey(int, auto=True)
+    stripe_id = Optional(str, unique=True)
     first_name = Optional(str)
     last_name = Optional(str)
     email = Required(str, unique=True)
@@ -31,7 +32,7 @@ class User(db.Entity):
 
 class Card(db.Entity):
     id = PrimaryKey(int, auto=True)
-    hash = Required(str, unique=True)
+    stripe_id = Optional(str, unique=True)
     last_four = Required(str)
     expiration_date = Required(date)
     verified = Required(bool, default=False)
@@ -52,6 +53,7 @@ class Card(db.Entity):
 
 class Transaction(db.Entity):
     id = PrimaryKey(int, auto=True)
+    stripe_id = Optional(str, unique=True)
     amount = Required(Decimal)
     completed = Required(bool, default=False)
     user = Required(User)
