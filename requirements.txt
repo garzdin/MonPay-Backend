@@ -3,3 +3,4 @@ pony
 gunicorn
 psycopg2
 pyjwt
+stripe
