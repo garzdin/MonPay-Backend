@@ -14,6 +14,7 @@ stripe.api_key = STRIPE_API_KEY
 
 app = API()
 app.add_route('/api/v1/account/create', AccountCreateResource())
+app.add_route('/api/v1/account/create/specs', AccountCreateSpecsResource())
 app.add_route('/api/v1/account/login', AccountLoginResource())
 app.add_route('/api/v1/account/reset', AccountResetResource())
 app.add_route('/api/v1/account/me', AccountResource())
