@@ -3,7 +3,7 @@ from falcon import API, HTTP_200
 import stripe
 from models import db
 from settings import DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME, STRIPE_API_KEY
-from controllers import *
+from controllers.account import *
 
 __all__ = ['app']
 
