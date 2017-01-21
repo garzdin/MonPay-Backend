@@ -2,7 +2,7 @@ from pony.orm import *
 from datetime import date, datetime
 from decimal import Decimal
 
-__all__ = ['db', 'User', 'Card', 'Transaction']
+__all__ = ['db', 'User', 'Account', 'Transaction']
 
 db = Database()
 
@@ -15,7 +15,7 @@ class User(db.Entity):
     email = Required(str, unique=True)
     password = Required(str)
     is_admin = Required(bool, default=False)
-    cards = Set('Card')
+    accounts = Set('Account')
     transactions = Set('Transaction')
     created_on = Optional(datetime)
     updated_on = Optional(datetime)
@@ -30,11 +30,11 @@ class User(db.Entity):
         self.version += 1
 
 
-class Card(db.Entity):
+class Account(db.Entity):
     id = PrimaryKey(int, auto=True)
     stripe_id = Optional(str, unique=True)
+    country = Required(str)
     last_four = Required(str)
-    expiration_date = Required(date)
     verified = Required(bool, default=False)
     user = Required(User)
     transactions = Set('Transaction')
@@ -57,7 +57,7 @@ class Transaction(db.Entity):
     amount = Required(Decimal)
     completed = Required(bool, default=False)
     user = Required(User)
-    card = Required(Card)
+    account = Required(Account)
     created_on = Optional(datetime)
     updated_on = Optional(datetime)
     version = Optional(int)
