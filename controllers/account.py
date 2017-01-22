@@ -3,25 +3,12 @@ from datetime import datetime
 from jwt import encode
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
-from middlewares.token import validate_token
+from middleware.token import validate_token
 from models import db_session, User
 from app import stripe
 
-__all__ = ['AccountCreateResource', 'AccountCreateSpecsResource',
-           'AccountLoginResource', 'AccountResetResource',
-           'AccountResource']
-
-
-class AccountCreateSpecsResource(object):
-    def on_get(self, req, resp):
-        """Handles GET requests"""
-        params = req.params
-        if 'country' not in params:
-            raise HTTPBadRequest(description="Country code required", code=1)
-        country = params['country']
-        spec = stripe.CountrySpec.retrieve(country)
-        fields = spec['verification_fields']['individual']
-        resp.body = dumps({"sepc": fields})
+__all__ = ['AccountCreateResource', 'AccountLoginResource',
+           'AccountResetResource', 'AccountResource']
 
 
 class AccountCreateResource(object):
@@ -52,6 +39,9 @@ class AccountCreateResource(object):
                 "day": data['dob']['day'],
                 "month": data['dob']['month'],
                 "year": data['dob']['year']
+            },
+            "verification": {
+                "document": data['verification']['file_id']
             }
         }
         tos_acceptance = {

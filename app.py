@@ -3,7 +3,9 @@ from falcon import API, HTTP_200
 import stripe
 from models import db
 from settings import DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME, STRIPE_API_KEY
+from middleware.file import MultipartMiddleware
 from controllers.account import *
+from controllers.misc import *
 
 __all__ = ['app']
 
@@ -12,9 +14,9 @@ db.generate_mapping(create_tables=True)
 
 stripe.api_key = STRIPE_API_KEY
 
-app = API()
+app = API(middleware=[MultipartMiddleware()])
+app.add_route('/api/v1/upload/file', FileUploadResource())
 app.add_route('/api/v1/account/create', AccountCreateResource())
-app.add_route('/api/v1/account/create/specs', AccountCreateSpecsResource())
 app.add_route('/api/v1/account/login', AccountLoginResource())
 app.add_route('/api/v1/account/reset', AccountResetResource())
 app.add_route('/api/v1/account/me', AccountResource())
