@@ -5,7 +5,6 @@ from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, be
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
 from models import db_session, User
-from app import stripe
 
 __all__ = ['AccountCreateResource', 'AccountLoginResource',
            'AccountResetResource', 'AccountResource']
@@ -24,39 +23,7 @@ class AccountCreateResource(object):
         user = User.select(lambda u: u.email == data['email'])
         if user:
             raise HTTPConflict(description="Email already exists", code=1)
-        if not 'first_name' in data or not 'last_name' in data or not 'type' or not 'country' in data or not 'address' in data or not 'dob' in data or not 'tos_acceptance' in data:
-            raise HTTPBadRequest(description="Some requried fields were not completed", code=1)
-        legal_entity = {
-            "first_name": data['first_name'],
-            "last_name": data['last_name'],
-            "type": data['type'],
-            "address": {
-                "city": data['address']['city'],
-                "line1": data['address']['line1'],
-                "postal_code": data['address']['postal_code']
-            },
-            "dob": {
-                "day": data['dob']['day'],
-                "month": data['dob']['month'],
-                "year": data['dob']['year']
-            },
-            "verification": {
-                "document": data['verification']['file_id']
-            }
-        }
-        tos_acceptance = {
-            "date": data['tos_acceptance']['date'],
-            "ip": data['tos_acceptance']['ip']
-        }
-        stripe_account = stripe.Account.create(
-            managed=True,
-            country=data['country'],
-            email=data['email'],
-            legal_entity=legal_entity,
-            tos_acceptance=tos_acceptance
-        )
         user = User(
-            stripe_id=stripe_account['id'],
             first_name=data['first_name'],
             last_name=data['last_name'],
             email=data['email'],
