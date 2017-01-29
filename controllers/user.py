@@ -4,7 +4,7 @@ from jwt import encode
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
-from models import User
+from models import User, session
 
 __all__ = ['UserCreateResource', 'UserLoginResource',
            'UserResetResource', 'UserResource']
@@ -19,7 +19,6 @@ class UserCreateResource(object):
             raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data or not 'password' in data:
             raise HTTPBadRequest(description="Email and password required")
-        from app import session # Prevent circular import
         user = session.query(User).filter(User.email == data['email']).first()
         if user:
             raise HTTPConflict(description="Email already exists")

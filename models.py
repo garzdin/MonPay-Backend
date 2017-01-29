@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import create_engine, Column, Integer, Float, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from settings import DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME
+from utils.db import construct_url
 
-__all__ = ['User', 'Account', 'Transaction']
+__all__ = ['User', 'Account', 'Transaction', 'session']
 
 Base = declarative_base()
 
@@ -73,3 +75,6 @@ class Transaction(Base):
     def before_update(self):
         self.updated_on = datetime.now()
         self.version += 1
+
+engine = create_engine(construct_url('postgres', DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME))
+session = sessionmaker(bind=engine)()
