@@ -4,49 +4,53 @@ from jwt import encode
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
-from models import db_session, User
+from models import User
 
-__all__ = ['AccountCreateResource', 'AccountLoginResource',
-           'AccountResetResource', 'AccountResource']
+__all__ = ['UserCreateResource', 'UserLoginResource',
+           'UserResetResource', 'UserResource']
 
 
-class AccountCreateResource(object):
-    @db_session
+class UserCreateResource(object):
     def on_post(self, req, resp):
         """Handles POST requests"""
         try:
             data = load(req.bounded_stream)
         except ValueError:
-            raise HTTPBadRequest(description="Invalid request", code=1)
+            raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data or not 'password' in data:
-            raise HTTPBadRequest(description="Email and password required", code=1)
-        user = User.select(lambda u: u.email == data['email'])
+            raise HTTPBadRequest(description="Email and password required")
+        from app import session # Prevent circular import
+        user = session.query(User).filter(User.email == data['email']).first()
         if user:
-            raise HTTPConflict(description="Email already exists", code=1)
+            raise HTTPConflict(description="Email already exists")
         user = User(
             first_name=data['first_name'],
             last_name=data['last_name'],
             email=data['email'],
             password=data['password']
         )
-        resp.body = dumps({"description": "User created succeffully", })
+        session.add(user)
+        session.commit()
+        resp.body = dumps({
+            "status": "success",
+            "user_id": user.id
+        })
 
 
-class AccountLoginResource(object):
-    @db_session
+class UserLoginResource(object):
     def on_post(self, req, resp):
         """Handels POST requests"""
         try:
             data = load(req.bounded_stream)
         except ValueError:
-            raise HTTPBadRequest(description="Invalid request", code=1)
+            raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data or not 'password' in data:
-            raise HTTPBadRequest(description="Email and password required", code=1)
+            raise HTTPBadRequest(description="Email and password required")
         user = User.get(email=data['email'])
         if not user:
-            raise HTTPNotFound(description="Email not found", code=1)
+            raise HTTPNotFound(description="Email not found")
         if not user.password == data['password']:
-            raise HTTPForbidden(description="Incorrect password", code=2)
+            raise HTTPForbidden(description="Incorrect password")
         token_data = {
             "iss": TOKEN_ISSUER,
             "aud": TOKEN_AUDIENCE,
@@ -59,25 +63,23 @@ class AccountLoginResource(object):
         resp.body = dumps({"message": "Logged in succeffully", "token": token})
 
 
-class AccountResetResource(object):
-    @db_session
+class UserResetResource(object):
     def on_post(self, req, resp):
         """Handle POST requests"""
         try:
             data = load(req.bounded_stream)
         except ValueError:
-            raise HTTPBadRequest(description="Invalid request", code=1)
+            raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data:
-            raise HTTPBadRequest(description="Email required", code=1)
+            raise HTTPBadRequest(description="Email required")
         user = User.get(email=data['email'])
         if not user:
-            raise HTTPNotFound(description="Email not found", code=1)
+            raise HTTPNotFound(description="Email not found")
         resp.body = dumps({"message": "Email sent", "status": "success"})
 
 
-class AccountResource(object):
+class UserResource(object):
     @before(validate_token)
-    @db_session
     def on_get(self, req, resp):
         if req.uid:
             user = User.get(id=req.uid)

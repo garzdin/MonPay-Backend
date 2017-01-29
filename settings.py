@@ -11,7 +11,7 @@ if 'DEBUG' in environ:
     DATABASE_HOST = 'postgres'
     DATABASE_NAME = 'monpaydb'
 else:
-    DATABASE_BASE_URL = environ['DATABASE_URL'].split('//')[1].split(':')
+    DATABASE_BASE_URL = environ.get('DATABASE_URL').split('//')[1].split(':')
     DATABASE_USER = DATABASE_BASE_URL[0]
     DATABASE_PASSWORD = DATABASE_BASE_URL[1].split('@')[0]
     DATABASE_HOST = DATABASE_BASE_URL[1].split('@')[1]

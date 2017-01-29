@@ -1,5 +1,5 @@
 falcon
-pony
+sqlalchemy
 gunicorn
 psycopg2
 pyjwt
