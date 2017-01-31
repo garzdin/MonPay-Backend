@@ -10,4 +10,4 @@ class FileUploadResource(object):
         if not 'image' in data:
             raise HTTPBadRequest(description="No image uploaded")
         image = data['image']
-        resp.body = dumps({"description": "Image uploaded succeffully"})
+        resp.body = dumps({"status": True})

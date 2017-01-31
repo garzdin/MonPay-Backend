@@ -31,7 +31,7 @@ class UserCreateResource(object):
         session.add(user)
         session.commit()
         resp.body = dumps({
-            "status": "success",
+            "status": True,
             "user_id": user.id
         })
 
@@ -53,13 +53,13 @@ class UserLoginResource(object):
         token_data = {
             "iss": TOKEN_ISSUER,
             "aud": TOKEN_AUDIENCE,
-            "iat": datetime.utcnow(),
+            "iat": str(datetime.utcnow()),
             "uid": user.id
         }
         if not 'remember' in data:
-            token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
+            token_data['exp'] = str(datetime.utcnow() + TOKEN_EXPIRATION)
         token = encode(token_data, SECRET)
-        resp.body = dumps({"status": "success", "token": token.decode("utf-8")})
+        resp.body = dumps({"status": True, "token": token.decode("utf-8")})
 
 
 class UserResetResource(object):
@@ -74,7 +74,7 @@ class UserResetResource(object):
         user = User.get(email=data['email'])
         if not user:
             raise HTTPNotFound(description="Email not found")
-        resp.body = dumps({"message": "Email sent", "status": "success"})
+        resp.body = dumps({"status": True})
 
 
 class UserResource(object):
@@ -83,10 +83,13 @@ class UserResource(object):
         if req.uid:
             user = User.get(id=req.uid)
             resp.body = dumps({
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "registered_on": str(user.created_on)
+                "status": True,
+                "user": {
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "registered_on": str(user.created_on)
+                }
             })
         else:
-            resp.body = dumps({"message": req.decode_error})
+            resp.body = dumps({"status": False, "error": req.decode_error})
