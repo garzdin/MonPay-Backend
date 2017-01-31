@@ -45,7 +45,7 @@ class UserLoginResource(object):
             raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data or not 'password' in data:
             raise HTTPBadRequest(description="Email and password required")
-        user = User.get(email=data['email'])
+        user = session.query(User).filter(User.email == data['email']).first()
         if not user:
             raise HTTPNotFound(description="Email not found")
         if not user.password == data['password']:
@@ -59,7 +59,7 @@ class UserLoginResource(object):
         if not 'remember' in data:
             token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
         token = encode(token_data, SECRET)
-        resp.body = dumps({"message": "Logged in succeffully", "token": token})
+        resp.body = dumps({"status": "success", "token": token.decode("utf-8")})
 
 
 class UserResetResource(object):
