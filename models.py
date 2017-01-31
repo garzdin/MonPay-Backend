@@ -77,4 +77,5 @@ class Transaction(Base):
         self.version += 1
 
 engine = create_engine(construct_url('postgres', DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME))
+Base.metadata.create_all(engine)
 session = sessionmaker(bind=engine)()
