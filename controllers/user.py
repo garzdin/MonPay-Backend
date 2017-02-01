@@ -53,11 +53,11 @@ class UserLoginResource(object):
         token_data = {
             "iss": TOKEN_ISSUER,
             "aud": TOKEN_AUDIENCE,
-            "iat": str(datetime.utcnow()),
+            "iat": datetime.utcnow(),
             "uid": user.id
         }
         if not 'remember' in data:
-            token_data['exp'] = str(datetime.utcnow() + TOKEN_EXPIRATION)
+            token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
         token = encode(token_data, SECRET)
         resp.body = dumps({"status": True, "token": token.decode("utf-8")})
 
@@ -81,7 +81,7 @@ class UserResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         if req.uid:
-            user = User.get(id=req.uid)
+            user = session.query(User).get(req.uid)
             resp.body = dumps({
                 "status": True,
                 "user": {
