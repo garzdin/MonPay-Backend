@@ -71,7 +71,7 @@ class UserResetResource(object):
             raise HTTPBadRequest(description="Invalid request")
         if not 'email' in data:
             raise HTTPBadRequest(description="Email required")
-        user = User.get(email=data['email'])
+        user = session.query(User).filter(User.email == data['email']).first()
         if not user:
             raise HTTPNotFound(description="Email not found")
         resp.body = dumps({"status": True})
