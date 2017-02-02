@@ -1,7 +1,7 @@
 from json import load, dumps
 from datetime import datetime
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
-from currencycloud import Beneficiary
+from currencycloud import Beneficiary, Reference
 from middleware.token import validate_token
 from models.models import User, session
 
@@ -66,3 +66,17 @@ def BeneficiaryDeleteResource(object):
                 description="Provide all needed required fields")
         beneficiary = Beneficiary.delete(data)
         resp.body = dumps({"status": True, "beneficiary": beneficiary})
+
+
+def BeneficiaryDetailsResource(object):
+    @before(validate_token)
+    def on_post(self, req, resp):
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request")
+        if 'beneficiary_country' not in data:
+            raise HTTPBadRequest(
+                description="Provide all needed required fields")
+        reference = Reference.beneficiary_required_details(data)
+        resp.body = dumps({"status": True, "reference": reference})
