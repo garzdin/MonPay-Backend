@@ -6,8 +6,8 @@ from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
 from models.models import User, session
 
-__all__ = ['UserCreateResource', 'UserLoginResource',
-           'UserResetResource', 'UserResource']
+__all__ = ['UserCreateResource', 'UserLoginResource', 'UserResetResource',
+           'UserResource']
 
 
 class UserCreateResource(object):
@@ -26,14 +26,10 @@ class UserCreateResource(object):
             first_name=data['first_name'],
             last_name=data['last_name'],
             email=data['email'],
-            password=data['password']
-        )
+            password=data['password'])
         session.add(user)
         session.commit()
-        resp.body = dumps({
-            "status": True,
-            "user_id": user.id
-        })
+        resp.body = dumps({"status": True, "user_id": user.id})
 
 
 class UserLoginResource(object):

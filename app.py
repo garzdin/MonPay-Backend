@@ -1,7 +1,8 @@
 from falcon import API
 from middleware.multipart import MultipartMiddleware
-from controllers.user import *
 from controllers.misc import *
+from controllers.user import *
+from controllers.beneficiary import *
 
 __all__ = ['app']
 
@@ -13,11 +14,11 @@ app.add_route('/api/v1/user/reset', UserResetResource())
 app.add_route('/api/v1/user/me', UserResource())
 # app.add_route('/api/v1/user/me/update', UserUpdateResource())
 # app.add_route('/api/v1/balance', BalanceGetResource())
-# app.add_route('/api/v1/beneficiary', BeneficiaryFindResource())
-# app.add_route('/api/v1/beneficiary/:id', BeneficiaryGetResource())
-# app.add_route('/api/v1/beneficiary/create', BeneficiaryCreateResource())
-# app.add_route('/api/v1/beneficiary/:id/update', BeneficiaryUpdateResource())
-# app.add_route('/api/v1/beneficiary/:id/delete', BeneficiaryDeleteResource())
+app.add_route('/api/v1/beneficiary', BeneficiaryListResource())
+app.add_route('/api/v1/beneficiary/{id}', BeneficiaryGetResource())
+app.add_route('/api/v1/beneficiary/create', BeneficiaryCreateResource())
+app.add_route('/api/v1/beneficiary/update', BeneficiaryUpdateResource())
+app.add_route('/api/v1/beneficiary/delete', BeneficiaryDeleteResource())
 # app.add_route('/api/v1/beneficiary/required', BeneficiaryRequiredDetailsResource())
 # app.add_route('/api/v1/contact', ContactFindResource())
 # app.add_route('/api/v1/contact/create', ContactCreateResource())
