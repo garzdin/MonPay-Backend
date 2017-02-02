@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, Float, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import create_engine, event, Column, Integer, Float, String, Boolean, Date, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -16,44 +16,97 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    date_of_birth = Column(Date)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+    entity_type = Column(Int)
+    street = Column(String)
+    city = Column(String)
+    state_or_province = Column(String)
+    postal_code = Column(Int)
+    country = Column(Int)
+    bank_country = Column(String)
+    id_type = Column(Int)
+    id_value = Column(String)
     is_admin = Column(Boolean, default=False)
     accounts = relationship("Account")
+    beneficiaries = relationship("Beneficiary")
     transactions = relationship("Transaction")
     created_on = Column(DateTime)
     updated_on = Column(DateTime)
     version = Column(Integer)
 
-    def before_insert(self):
-        self.created_on = datetime.now()
-        self.version = 1
+@event.listens_for(User, 'before_insert')
+def user_before_insert(mapper, connection, target):
+    target.created_on = datetime.now()
+    target.version = 1
 
-    def before_update(self):
-        self.updated_on = datetime.now()
-        self.version += 1
+@event.listens_for(User, 'before_update')
+def user_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
+
+
+class Beneficiary(Base):
+    __tablename__ = 'beneficiaries'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    first_name = Column(String)
+    last_name = Column(String)
+    date_of_birth = Column(Date)
+    country = Column(String)
+    email = Column(String)
+    address = Column(String)
+    city = Column(String)
+    state_or_province = Column(String)
+    postal_code = Column(Int)
+    country = Column(Int)
+    default = Column(Boolean, default=False)
+    type = Column(Int)
+    company = Column(String)
+    id_type = Column(Int)
+    id_value = Column(String)
+    type = Column(Int)
+    created_on = Column(DateTime)
+    updated_on = Column(DateTime)
+    version = Column(Integer)
+
+@event.listens_for(Beneficiary, 'before_insert')
+def user_before_insert(mapper, connection, target):
+    target.created_on = datetime.now()
+    target.version = 1
+
+@event.listens_for(Beneficiary, 'before_update')
+def user_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
 
 
 class Account(Base):
     __tablename__ = 'accounts'
 
     id = Column(Integer, primary_key=True)
-    country = Column(String, nullable=False)
-    last_four = Column(String, nullable=False)
-    verified = Column(Boolean, default=False)
+    iban = Column(String, nullable=False)
+    bic_swift = Column(String, nullable=False)
+    currency = Column(Int)
+    country = Column(Int)
+    type = Column(Int)
     user = Column(Integer, ForeignKey('users.id'))
     transactions = relationship("Transaction")
     created_on = Column(DateTime)
     updated_on = Column(DateTime)
     version = Column(Integer)
 
-    def before_insert(self):
-        self.created_on = datetime.now()
-        self.version = 1
+@event.listens_for(Account, 'before_insert')
+def user_before_insert(mapper, connection, target):
+    target.created_on = datetime.now()
+    target.version = 1
 
-    def before_update(self):
-        self.updated_on = datetime.now()
-        self.version += 1
+@event.listens_for(Account, 'before_update')
+def user_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
 
 
 class Transaction(Base):
@@ -61,20 +114,27 @@ class Transaction(Base):
 
     id = Column(Integer, primary_key=True)
     amount = Column(Float)
+    currency = Column(Int)
+    reason = Column(String)
+    reference = Column(String)
+    type = Column(Int)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
+    beneficiary = Column(Integer, ForeignKey('beneficiaries.id'))
     account = Column(Integer, ForeignKey('accounts.id'))
     created_on = Column(DateTime)
     updated_on = Column(DateTime)
     version = Column(Integer)
 
-    def before_insert(self):
-        self.created_on = datetime.now()
-        self.version = 1
+@event.listens_for(Transaction, 'before_insert')
+def user_before_insert(mapper, connection, target):
+    target.created_on = datetime.now()
+    target.version = 1
 
-    def before_update(self):
-        self.updated_on = datetime.now()
-        self.version += 1
+@event.listens_for(Transaction, 'before_update')
+def user_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
 
 engine = create_engine(construct_url('postgres', DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME))
 Base.metadata.create_all(engine)
