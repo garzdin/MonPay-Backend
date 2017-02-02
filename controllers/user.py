@@ -4,7 +4,7 @@ from jwt import encode
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
-from models import User, session
+from models.models import User, session
 
 __all__ = ['UserCreateResource', 'UserLoginResource',
            'UserResetResource', 'UserResource']
