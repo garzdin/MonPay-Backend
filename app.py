@@ -1,10 +1,15 @@
 from falcon import API
+import currencycloud
 from middleware.multipart import MultipartMiddleware
 from controllers.misc import *
 from controllers.user import *
 from controllers.beneficiary import *
 
 __all__ = ['app']
+
+currencycloud.environment = currencycloud.ENV_DEMOSTRATION
+currencycloud.login_id = 'rjnienaber@gmail.com'
+currencycloud.api_key = 'ef0fd50fca1fb14c1fab3a8436b9ecb65f02f129fd87eafa45ded8ae257528f0'
 
 app = API(middleware=[MultipartMiddleware()])
 app.add_route('/api/v1/upload/file', FileUploadResource())

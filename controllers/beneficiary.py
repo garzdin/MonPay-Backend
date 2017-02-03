@@ -2,31 +2,33 @@ from json import load, dumps
 from datetime import datetime
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from currencycloud import Beneficiary, Reference
+from currencycloud.resourceful_collection import ResourcefulCollection
 from middleware.token import validate_token
 from models.models import User, session
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
-           'BeneficiaryDeleteResource']
+           'BeneficiaryDeleteResource', 'BeneficiaryDetailsResource']
 
 
-def BeneficiaryListResource(object):
+class BeneficiaryListResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         """Handles GET requests"""
         beneficiaries = Beneficiary.find()
-        resp.body = dumps({"status": True, "beneficiaries": beneficiaries})
+        output = [beneficiary.data for beneficiary in beneficiaries]
+        resp.body = dumps({"status": True, "beneficiaries": output})
 
 
-def BeneficiaryGetResource(object):
+class BeneficiaryGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp, id):
         """Handles GET requests"""
         beneficiary = Beneficiary.retrieve(id)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary})
+        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
 
 
-def BeneficiaryCreateResource(object):
+class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
     @before(validate_token)
     def on_post(self, req, resp):
         try:
@@ -36,11 +38,11 @@ def BeneficiaryCreateResource(object):
         if 'bank_account_holder_name' not in data or 'bank_country' not in data or 'currency' not in data or 'name' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = Beneficiary.create(data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary})
+        beneficiary = Beneficiary.create(**data)
+        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
 
 
-def BeneficiaryUpdateResource(object):
+class BeneficiaryUpdateResource(object):
     @before(validate_token)
     def on_post(self, req, resp):
         try:
@@ -50,11 +52,11 @@ def BeneficiaryUpdateResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = Beneficiary.update(data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary})
+        beneficiary = Beneficiary.update_id(data['id'], **data)
+        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
 
 
-def BeneficiaryDeleteResource(object):
+class BeneficiaryDeleteResource(object):
     @before(validate_token)
     def on_post(self, req, resp):
         try:
@@ -65,10 +67,10 @@ def BeneficiaryDeleteResource(object):
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = Beneficiary.delete(data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary})
+        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
 
 
-def BeneficiaryDetailsResource(object):
+class BeneficiaryDetailsResource(object):
     @before(validate_token)
     def on_post(self, req, resp):
         try:
@@ -78,5 +80,6 @@ def BeneficiaryDetailsResource(object):
         if 'beneficiary_country' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        reference = Reference.beneficiary_required_details(data)
-        resp.body = dumps({"status": True, "reference": reference})
+        reference = Reference.beneficiary_required_details(**data)
+        output = [ref.data for ref in reference]
+        resp.body = dumps({"status": True, "reference": output})
