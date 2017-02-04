@@ -4,6 +4,7 @@ from middleware.multipart import MultipartMiddleware
 from controllers.misc import *
 from controllers.user import *
 from controllers.beneficiary import *
+from controllers.conversion import *
 
 __all__ = ['app']
 
@@ -18,20 +19,16 @@ app.add_route('/api/v1/user/login', UserLoginResource())
 app.add_route('/api/v1/user/reset', UserResetResource())
 app.add_route('/api/v1/user/me', UserResource())
 # app.add_route('/api/v1/user/me/update', UserUpdateResource())
-# app.add_route('/api/v1/balance', BalanceGetResource())
 app.add_route('/api/v1/beneficiary', BeneficiaryListResource())
 app.add_route('/api/v1/beneficiary/{id}', BeneficiaryGetResource())
 app.add_route('/api/v1/beneficiary/create', BeneficiaryCreateResource())
 app.add_route('/api/v1/beneficiary/update', BeneficiaryUpdateResource())
 app.add_route('/api/v1/beneficiary/delete', BeneficiaryDeleteResource())
 app.add_route('/api/v1/beneficiary/required', BeneficiaryDetailsResource())
-# app.add_route('/api/v1/contact', ContactFindResource())
-# app.add_route('/api/v1/contact/create', ContactCreateResource())
-# app.add_route('/api/v1/contact/:id/update', ContactUpdateResource())
-# app.add_route('/api/v1/conversion', ConversionFindResource())
-# app.add_route('/api/v1/conversion/:id', ConversionGetResource())
-# app.add_route('/api/v1/conversion/create', ConversionCreateResource())
-# app.add_route('/api/v1/conversion/dates', ConversionDatesResource())
+app.add_route('/api/v1/conversion', ConversionListResource())
+app.add_route('/api/v1/conversion/{pair}', ConversionGetResource())
+app.add_route('/api/v1/conversion/create', ConversionCreateResource())
+app.add_route('/api/v1/conversion/dates', ConversionDatesResource())
 # app.add_route('/api/v1/payment', PaymentFindResource())
 # app.add_route('/api/v1/payment/:id', PaymentGetResource())
 # app.add_route('/api/v1/payment/create', PaymentCreateResource())

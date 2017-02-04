@@ -1,8 +1,6 @@
 from json import load, dumps
-from datetime import datetime
-from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
+from falcon import HTTPBadRequest, before
 from currencycloud import Beneficiary, Reference
-from currencycloud.resourceful_collection import ResourcefulCollection
 from middleware.token import validate_token
 from models.models import User, session
 
@@ -82,4 +80,4 @@ class BeneficiaryDetailsResource(object):
                 description="Provide all needed required fields")
         reference = Reference.beneficiary_required_details(**data)
         output = [ref.data for ref in reference]
-        resp.body = dumps({"status": True, "reference": output})
+        resp.body = dumps({"status": True, "required": output})
