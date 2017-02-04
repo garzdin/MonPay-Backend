@@ -14,6 +14,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
+    ref = Column(String, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     date_of_birth = Column(Date)
@@ -51,6 +52,7 @@ class Beneficiary(Base):
     __tablename__ = 'beneficiaries'
 
     id = Column(Integer, primary_key=True)
+    ref = Column(String, unique=True)
     name = Column(String)
     first_name = Column(String)
     last_name = Column(String)
@@ -117,6 +119,7 @@ class Transaction(Base):
     __tablename__ = 'transactions'
 
     id = Column(Integer, primary_key=True)
+    ref = Column(String, unique=True)
     amount = Column(Float)
     currency = Column(Integer)
     reason = Column(String)
