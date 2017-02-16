@@ -1,6 +1,5 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, before
-from currencycloud import Conversion, Reference
 from middleware.token import validate_token
 
 __all__ = ['ConversionListResource', 'ConversionGetResource',

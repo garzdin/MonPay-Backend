@@ -3,4 +3,3 @@ sqlalchemy
 gunicorn
 psycopg2
 pyjwt
-currencycloud

@@ -1,6 +1,5 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, before
-from currencycloud import Beneficiary, Reference
 from middleware.token import validate_token
 from models.models import User, session
 
