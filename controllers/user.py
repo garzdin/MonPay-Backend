@@ -81,7 +81,7 @@ class UserRefreshResource(object):
             raise HTTPBadRequest(description="Could not decode refresh token")
         else:
             new_token_data = refresh_token
-            new_token_data['exp'] = "exp": datetime.utcnow() + TOKEN_EXPIRATION
+            new_token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
             new_token = encode(new_token_data, SECRET)
         resp.body = dumps({"status": True, "token": new_token.decode("utf-8"), "refresh_token": refresh_token})
 
