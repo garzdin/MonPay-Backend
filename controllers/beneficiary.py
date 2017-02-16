@@ -69,7 +69,7 @@ class BeneficiaryUpdateResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = session.query(Beneficiary).get(req.uid)
+        beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id']).first()
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
         beneficiary.update(**data)
@@ -92,7 +92,7 @@ class BeneficiaryDeleteResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = session.query(Beneficiary).get(req.uid)
+        beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id']).first()
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
         session.delete(beneficiary)

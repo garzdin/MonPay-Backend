@@ -71,7 +71,7 @@ class TransactionDeleteResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        transaction = session.query(Transaction).get(req.uid)
+        transaction = session.query(Transaction).filter(Transaction.user.id == req.uid, Transaction.id == data['id']).first()
         if not transaction:
             raise HTTPNotFound(description="Transaction not found")
         session.delete(transaction)
