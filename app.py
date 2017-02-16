@@ -4,6 +4,7 @@ from controllers.file import *
 from controllers.user import *
 from controllers.beneficiary import *
 from controllers.transaction import *
+from controllers.account import *
 
 __all__ = ['app']
 
@@ -15,6 +16,11 @@ app.add_route('/api/v1/auth/refresh', UserRefreshResource())
 app.add_route('/api/v1/auth/reset', UserResetResource())
 app.add_route('/api/v1/user', UserGetResource())
 app.add_route('/api/v1/user/update', UserUpdateResource())
+app.add_route('/api/v1/account', AccountListResource())
+app.add_route('/api/v1/account/{id}', AccountGetResource())
+app.add_route('/api/v1/account/create', AccountCreateResource())
+app.add_route('/api/v1/account/update', AccountUpdateResource())
+app.add_route('/api/v1/account/delete', AccountDeleteResource())
 app.add_route('/api/v1/beneficiary', BeneficiaryListResource())
 app.add_route('/api/v1/beneficiary/{id}', BeneficiaryGetResource())
 app.add_route('/api/v1/beneficiary/create', BeneficiaryCreateResource())
