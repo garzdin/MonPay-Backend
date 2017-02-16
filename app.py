@@ -3,7 +3,6 @@ from middleware.multipart import MultipartMiddleware
 from controllers.file import *
 from controllers.user import *
 from controllers.beneficiary import *
-from controllers.conversion import *
 
 __all__ = ['app']
 
@@ -20,15 +19,4 @@ app.add_route('/api/v1/beneficiary/{id}', BeneficiaryGetResource())
 app.add_route('/api/v1/beneficiary/create', BeneficiaryCreateResource())
 app.add_route('/api/v1/beneficiary/update', BeneficiaryUpdateResource())
 app.add_route('/api/v1/beneficiary/delete', BeneficiaryDeleteResource())
-# app.add_route('/api/v1/payment', PaymentFindResource())
-# app.add_route('/api/v1/payment/:id', PaymentGetResource())
-# app.add_route('/api/v1/payment/create', PaymentCreateResource())
-# app.add_route('/api/v1/payment/:id/update', PaymentUpdateResource())
-# app.add_route('/api/v1/payment/:id/delete', PaymentDeleteResource())
-# app.add_route('/api/v1/payment/dates', PaymentDatesResource())
-# app.add_route('/api/v1/currency', CurrencyListResource())
-# app.add_route('/api/v1/currency/rate', CurrencyRateResource())
-# app.add_route('/api/v1/transaction', TransactionListResource())
-# app.add_route('/api/v1/transaction/:id', TransactionGetResource())
-# app.add_route('/api/v1/ref/:id/delete', PaymentDeleteResource())
 # app.add_route('/api/v1/analytics', AnalyticsResource())
