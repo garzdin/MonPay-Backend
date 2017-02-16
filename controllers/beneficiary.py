@@ -1,19 +1,24 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, before
 from middleware.token import validate_token
-from models.models import User, session
+from models.models import User, Beneficiary, session
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
-           'BeneficiaryDeleteResource', 'BeneficiaryDetailsResource']
+           'BeneficiaryDeleteResource']
 
 
 class BeneficiaryListResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         """Handles GET requests"""
-        beneficiaries = Beneficiary.find()
-        output = [beneficiary.data for beneficiary in beneficiaries]
+        beneficiaries = session.query(Beneficiary).filter(Beneficiary.user.id == req.id)
+        output = [{
+            "id": beneficiary.id,
+            "first_name": beneficiary.first_name,
+            "last_name": beneficiary.last_name,
+            "email": beneficiary.email
+        } for beneficiary in beneficiaries]
         resp.body = dumps({"status": True, "beneficiaries": output})
 
 
@@ -21,8 +26,13 @@ class BeneficiaryGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp, id):
         """Handles GET requests"""
-        beneficiary = Beneficiary.retrieve(id)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
+        beneficiary = session.query(Beneficiary).get(req.uid)
+        resp.body = dumps({"status": True, "beneficiary": {
+            "id": beneficiary.id,
+            "first_name": beneficiary.first_name,
+            "last_name": beneficiary.last_name,
+            "email": beneficiary.email
+        })
 
 
 class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
@@ -35,8 +45,15 @@ class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
         if 'bank_account_holder_name' not in data or 'bank_country' not in data or 'currency' not in data or 'name' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = Beneficiary.create(**data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
+        beneficiary = Beneficiary(**data)
+        session.add(beneficiary)
+        session.commit()
+        resp.body = dumps({"status": True, "beneficiary": {
+            "id": beneficiary.id,
+            "first_name": beneficiary.first_name,
+            "last_name": beneficiary.last_name,
+            "email": beneficiary.email
+        })
 
 
 class BeneficiaryUpdateResource(object):
@@ -49,8 +66,15 @@ class BeneficiaryUpdateResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = Beneficiary.update_id(data['id'], **data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
+        beneficiary = session.query(Beneficiary).get(req.uid)
+        beneficiary.update(**data)
+        session.commit()
+        resp.body = dumps({"status": True, "beneficiary": {
+            "id": beneficiary.id,
+            "first_name": beneficiary.first_name,
+            "last_name": beneficiary.last_name,
+            "email": beneficiary.email
+        })
 
 
 class BeneficiaryDeleteResource(object):
@@ -63,20 +87,12 @@ class BeneficiaryDeleteResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = Beneficiary.delete(data)
-        resp.body = dumps({"status": True, "beneficiary": beneficiary.data})
-
-
-class BeneficiaryDetailsResource(object):
-    @before(validate_token)
-    def on_post(self, req, resp):
-        try:
-            data = load(req.bounded_stream)
-        except ValueError:
-            raise HTTPBadRequest(description="Invalid request")
-        if 'beneficiary_country' not in data:
-            raise HTTPBadRequest(
-                description="Provide all needed required fields")
-        reference = Reference.beneficiary_required_details(**data)
-        output = [ref.data for ref in reference]
-        resp.body = dumps({"status": True, "required": output})
+        beneficiary = session.query(Beneficiary).get(req.uid)
+        session.delete(beneficiary)
+        session.commit()
+        resp.body = dumps({"status": True, "beneficiary": {
+            "id": beneficiary.id,
+            "first_name": beneficiary.first_name,
+            "last_name": beneficiary.last_name,
+            "email": beneficiary.email
+        })
