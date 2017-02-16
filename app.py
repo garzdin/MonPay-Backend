@@ -1,6 +1,6 @@
 from falcon import API
 from middleware.multipart import MultipartMiddleware
-from controllers.misc import *
+from controllers.file import *
 from controllers.user import *
 from controllers.beneficiary import *
 from controllers.conversion import *
