@@ -69,11 +69,12 @@ class BeneficiaryUpdateResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id']).first()
+        beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id'])
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
-        beneficiary.update(**data)
+        beneficiary.update(data['update'])
         session.commit()
+        beneficiary = beneficiary.first()
         resp.body = dumps({"status": True, "beneficiary": {
             "id": beneficiary.id,
             "first_name": beneficiary.first_name,
@@ -89,7 +90,7 @@ class BeneficiaryDeleteResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data:
+        if 'id' not in data or 'update' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id']).first()
