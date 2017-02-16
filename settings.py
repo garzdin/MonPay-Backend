@@ -18,6 +18,6 @@ else:
     DATABASE_NAME = DATABASE_BASE_URL[2].split('/')[1]
 
 # Token related settings
-TOKEN_EXPIRATION = timedelta(hours=2)
+TOKEN_EXPIRATION = timedelta(hours=1)
 TOKEN_ISSUER = 'MonPay Ltd.'
 TOKEN_AUDIENCE = 'MonPay Client'
