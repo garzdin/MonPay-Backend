@@ -1,7 +1,7 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, before
 from middleware.token import validate_token
-from models.models import User, Beneficiary, session
+from models.models import Beneficiary, session
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
@@ -32,7 +32,7 @@ class BeneficiaryGetResource(object):
             "first_name": beneficiary.first_name,
             "last_name": beneficiary.last_name,
             "email": beneficiary.email
-        })
+        }})
 
 
 class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
@@ -53,7 +53,7 @@ class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
             "first_name": beneficiary.first_name,
             "last_name": beneficiary.last_name,
             "email": beneficiary.email
-        })
+        }})
 
 
 class BeneficiaryUpdateResource(object):
@@ -74,7 +74,7 @@ class BeneficiaryUpdateResource(object):
             "first_name": beneficiary.first_name,
             "last_name": beneficiary.last_name,
             "email": beneficiary.email
-        })
+        }})
 
 
 class BeneficiaryDeleteResource(object):
@@ -95,4 +95,4 @@ class BeneficiaryDeleteResource(object):
             "first_name": beneficiary.first_name,
             "last_name": beneficiary.last_name,
             "email": beneficiary.email
-        })
+        }})
