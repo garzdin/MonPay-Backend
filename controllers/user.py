@@ -7,7 +7,7 @@ from middleware.token import validate_token
 from models.models import User, session
 
 __all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
-           'UserResetResource', 'UserGetResource']
+           'UserResetResource', 'UserGetResource', 'UserUpdateResource']
 
 
 class UserCreateResource(object):
@@ -107,6 +107,31 @@ class UserGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         user = session.query(User).get(req.uid)
+        resp.body = dumps({"status": True, "user": {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "registered_on": str(user.created_on)
+        }})
+
+
+class UserUpdateResource(object):
+    @before(validate_token)
+    def on_post(self, req, resp):
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request")
+        if 'id' not in data or 'update' not in data:
+            raise HTTPBadRequest(
+                description="Provide all needed required fields")
+        user = session.query(User).filter(User.user == req.uid)
+        if not user:
+            raise HTTPNotFound(description="User not found")
+        user.update(data['update'])
+        session.commit()
+        user = beneficiary.first()
         resp.body = dumps({"status": True, "user": {
             "id": user.id,
             "email": user.email,
