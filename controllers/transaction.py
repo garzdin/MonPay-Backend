@@ -11,7 +11,7 @@ class TransactionListResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         """Handles GET requests"""
-        transactions = session.query(Transaction).filter(Transaction.user.id == req.id)
+        transactions = session.query(Transaction).filter(Transaction.user.id == req.uid)
         output = [{
             "id": transaction.id,
             "amount": transaction.amount,
@@ -26,7 +26,7 @@ class TransactionGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp, id):
         """Handles GET requests"""
-        transaction = session.query(Transaction).get(req.uid)
+        transaction = session.query(Transaction).filter(Transaction.user.id == req.uid, Transaction.id == id).first()
         resp.body = dumps({"status": True, "transaction": {
             "id": transaction.id,
             "amount": transaction.amount,
@@ -47,6 +47,7 @@ class TransactionCreateResource(object): #TODO Find bank info from IBAN
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         transaction = Transaction(**data)
+        transaction.user = req.uid
         session.add(transaction)
         session.commit()
         resp.body = dumps({"status": True, "transaction": {

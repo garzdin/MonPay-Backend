@@ -12,7 +12,7 @@ class BeneficiaryListResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         """Handles GET requests"""
-        beneficiaries = session.query(Beneficiary).filter(Beneficiary.user.id == req.id)
+        beneficiaries = session.query(Beneficiary).filter(Beneficiary.user == req.uid)
         output = [{
             "id": beneficiary.id,
             "first_name": beneficiary.first_name,
@@ -26,7 +26,7 @@ class BeneficiaryGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp, id):
         """Handles GET requests"""
-        beneficiary = session.query(Beneficiary).get(req.uid)
+        beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == id).first()
         resp.body = dumps({"status": True, "beneficiary": {
             "id": beneficiary.id,
             "first_name": beneficiary.first_name,
@@ -42,10 +42,11 @@ class BeneficiaryCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'bank_account_holder_name' not in data or 'bank_country' not in data or 'currency' not in data or 'name' not in data:
+        if 'first_name' not in data or 'last_name' not in data or 'country' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = Beneficiary(**data)
+        beneficiary.user = req.uid
         session.add(beneficiary)
         session.commit()
         resp.body = dumps({"status": True, "beneficiary": {
