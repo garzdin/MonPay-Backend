@@ -66,7 +66,7 @@ class BeneficiaryUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data:
+        if 'id' not in data or 'update' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id'])
@@ -90,7 +90,7 @@ class BeneficiaryDeleteResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data or 'update' not in data:
+        if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id']).first()
