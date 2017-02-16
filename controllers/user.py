@@ -7,7 +7,7 @@ from middleware.token import validate_token
 from models.models import User, session
 
 __all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
-           'UserResetResource', 'UserResource']
+           'UserResetResource', 'UserGetResource']
 
 
 class UserCreateResource(object):
@@ -101,19 +101,13 @@ class UserResetResource(object):
         resp.body = dumps({"status": True})
 
 
-class UserResource(object):
+class UserGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
-        if req.uid:
-            user = session.query(User).get(req.uid)
-            resp.body = dumps({
-                "status": True,
-                "user": {
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "registered_on": str(user.created_on)
-                }
-            })
-        else:
-            resp.body = dumps({"status": False, "error": req.decode_error})
+        user = session.query(User).get(req.uid)
+        resp.body = dumps({"status": True, "user": {
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "registered_on": str(user.created_on)
+        }})
