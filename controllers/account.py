@@ -14,6 +14,7 @@ class AccountListResource(object):
         """Handles GET requests"""
         accounts = session.query(Account).filter(Account.user == req.uid)
         output = [{
+            "id": account.id,
             "iban": account.iban,
             "bic_swift": account.bic_swift,
             "currency": account.currency,
@@ -30,6 +31,7 @@ class AccountGetResource(object):
         if not account:
             raise HTTPNotFound(description="Account not found")
         resp.body = dumps({"status": True, "account": {
+            "id": account.id,
             "iban": account.iban,
             "bic_swift": account.bic_swift,
             "currency": account.currency,
@@ -52,6 +54,7 @@ class AccountCreateResource(object):
         session.add(account)
         session.commit()
         resp.body = dumps({"status": True, "account": {
+            "id": account.id,
             "iban": account.iban,
             "bic_swift": account.bic_swift,
             "currency": account.currency,
@@ -76,6 +79,7 @@ class AccountUpdateResource(object):
         session.commit()
         account = account.first()
         resp.body = dumps({"status": True, "account": {
+            "id": account.id,
             "iban": account.iban,
             "bic_swift": account.bic_swift,
             "currency": account.currency,
@@ -99,6 +103,7 @@ class AccountDeleteResource(object):
         session.delete(account)
         session.commit()
         resp.body = dumps({"status": True, "account": {
+            "id": account.id,
             "iban": account.iban,
             "bic_swift": account.bic_swift,
             "currency": account.currency,
