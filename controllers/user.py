@@ -6,8 +6,8 @@ from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
 from models.models import User, session
 
-__all__ = ['UserCreateResource', 'UserLoginResource', 'UserResetResource',
-           'UserResource']
+__all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
+           'UserResetResource', 'UserResource']
 
 
 class UserCreateResource(object):
@@ -50,12 +50,40 @@ class UserLoginResource(object):
             "iss": TOKEN_ISSUER,
             "aud": TOKEN_AUDIENCE,
             "iat": datetime.utcnow(),
+            "exp": datetime.utcnow() + TOKEN_EXPIRATION,
             "uid": user.id
         }
-        if not 'remember' in data:
-            token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
+        refresh_token_data = {
+            "iss": TOKEN_ISSUER,
+            "aud": TOKEN_AUDIENCE,
+            "iat": datetime.utcnow(),
+            "uid": user.id
+        }
         token = encode(token_data, SECRET)
-        resp.body = dumps({"status": True, "token": token.decode("utf-8")})
+        refresh_token = encode(refresh_token_data, SECRET)
+        resp.body = dumps({"status": True, "token": token.decode("utf-8"), "refresh_token": refresh_token.decode("utf-8")})
+
+
+class UserRefreshResource(object):
+    def on_post(self, req, resp):
+        """Handles POST requests"""
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request")
+        if not 'token' in data or not 'refresh_token' in data:
+            raise HTTPBadRequest(description="Token and refresh token required")
+        token = data['token']
+        refresh_token = data['refresh_token']
+        try:
+            decoded = decode(refresh_token, SECRET, audience=TOKEN_AUDIENCE)
+        except DecodeError as e:
+            raise HTTPBadRequest(description="Could not decode refresh token")
+        else:
+            new_token_data = refresh_token
+            new_token_data['exp'] = "exp": datetime.utcnow() + TOKEN_EXPIRATION
+            new_token = encode(new_token_data, SECRET)
+        resp.body = dumps({"status": True, "token": new_token.decode("utf-8"), "refresh_token": refresh_token})
 
 
 class UserResetResource(object):
