@@ -1,5 +1,5 @@
 from json import load, dumps
-from falcon import HTTPBadRequest, before
+from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
 from models.models import Transaction, session
 
@@ -27,6 +27,8 @@ class TransactionGetResource(object):
     def on_get(self, req, resp, id):
         """Handles GET requests"""
         transaction = session.query(Transaction).filter(Transaction.user.id == req.uid, Transaction.id == id).first()
+        if not transaction:
+            raise HTTPNotFound(description="Transaction not found")
         resp.body = dumps({"status": True, "transaction": {
             "id": transaction.id,
             "amount": transaction.amount,
@@ -70,6 +72,8 @@ class TransactionDeleteResource(object):
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         transaction = session.query(Transaction).get(req.uid)
+        if not transaction:
+            raise HTTPNotFound(description="Transaction not found")
         session.delete(transaction)
         session.commit()
         resp.body = dumps({"status": True, "transaction": {

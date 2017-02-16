@@ -1,5 +1,5 @@
 from json import load, dumps
-from falcon import HTTPBadRequest, before
+from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
 from models.models import Beneficiary, session
 
@@ -27,6 +27,8 @@ class BeneficiaryGetResource(object):
     def on_get(self, req, resp, id):
         """Handles GET requests"""
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == id).first()
+        if not beneficiary:
+            raise HTTPNotFound(description="Beneficiary not found")
         resp.body = dumps({"status": True, "beneficiary": {
             "id": beneficiary.id,
             "first_name": beneficiary.first_name,
@@ -68,6 +70,8 @@ class BeneficiaryUpdateResource(object):
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).get(req.uid)
+        if not beneficiary:
+            raise HTTPNotFound(description="Beneficiary not found")
         beneficiary.update(**data)
         session.commit()
         resp.body = dumps({"status": True, "beneficiary": {
@@ -89,6 +93,8 @@ class BeneficiaryDeleteResource(object):
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).get(req.uid)
+        if not beneficiary:
+            raise HTTPNotFound(description="Beneficiary not found")
         session.delete(beneficiary)
         session.commit()
         resp.body = dumps({"status": True, "beneficiary": {
