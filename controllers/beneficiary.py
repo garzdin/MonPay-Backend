@@ -35,7 +35,7 @@ class BeneficiaryGetResource(object):
         }})
 
 
-class BeneficiaryCreateResource(object): #TODO Find bank info from IBAN
+class BeneficiaryCreateResource(object):
     @before(validate_token)
     def on_post(self, req, resp):
         try:
