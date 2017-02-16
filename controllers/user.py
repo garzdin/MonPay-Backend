@@ -22,14 +22,16 @@ class UserCreateResource(object):
         user = session.query(User).filter(User.email == data['email']).first()
         if user:
             raise HTTPConflict(description="Email already exists")
-        user = User(
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            email=data['email'],
-            password=data['password'])
+        user = User(**data)
         session.add(user)
         session.commit()
-        resp.body = dumps({"status": True, "user_id": user.id})
+        resp.body = dumps({"status": True, "user": {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "registered_on": str(user.created_on)
+        }})
 
 
 class UserLoginResource(object):
@@ -106,6 +108,7 @@ class UserGetResource(object):
     def on_get(self, req, resp):
         user = session.query(User).get(req.uid)
         resp.body = dumps({"status": True, "user": {
+            "id": user.id,
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
