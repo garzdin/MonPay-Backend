@@ -107,6 +107,8 @@ class UserGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         user = session.query(User).get(req.uid)
+        if not user:
+            raise HTTPNotFound(description="User not found")
         resp.body = dumps({"status": True, "user": {
             "id": user.id,
             "email": user.email,
