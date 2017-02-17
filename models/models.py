@@ -128,6 +128,7 @@ def transaction_before_update(mapper, connection, target):
 class Address(Base):
     __tablename__ = 'addresses'
 
+    id = Column(Integer, primary_key=True)
     address = Column(String)
     city = Column(String)
     state_or_province = Column(String)
@@ -137,6 +138,9 @@ class Address(Base):
     user = relationship("User", back_populates="addresses")
     beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'))
     beneficiary = relationship("Beneficiary", back_populates="addresses")
+    created_on = Column(DateTime)
+    updated_on = Column(DateTime)
+    version = Column(Integer)
 
 @event.listens_for(Address, 'before_insert')
 def address_before_insert(mapper, connection, target):
