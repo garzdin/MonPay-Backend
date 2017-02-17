@@ -14,20 +14,16 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    date_of_birth = Column(Date)
+    entity_type = Column(Integer)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    street = Column(String)
-    city = Column(String)
-    state_or_province = Column(String)
-    postal_code = Column(Integer)
-    country = Column(String)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    address = relationship("Address", uselist=False, back_populates="users")
+    date_of_birth = Column(Date)
     id_type = Column(Integer)
     id_value = Column(String)
     is_admin = Column(Boolean, default=False)
-    entity_type = Column(Integer)
     accounts = relationship("Account")
     beneficiaries = relationship("Beneficiary")
     transactions = relationship("Transaction")
@@ -50,18 +46,14 @@ class Beneficiary(Base):
     __tablename__ = 'beneficiaries'
 
     id = Column(Integer, primary_key=True)
+    entity_type = Column(Integer)
+    email = Column(String)
     first_name = Column(String)
     last_name = Column(String)
+    address = relationship("Address", uselist=False, back_populates="users")
     date_of_birth = Column(Date)
-    email = Column(String)
-    address = Column(String)
-    city = Column(String)
-    state_or_province = Column(String)
-    postal_code = Column(Integer)
-    country = Column(String)
     id_type = Column(Integer)
     id_value = Column(String)
-    entity_type = Column(Integer)
     user = Column(Integer, ForeignKey('users.id'))
     accounts = relationship("Account")
     transactions = relationship("Transaction")
@@ -70,12 +62,12 @@ class Beneficiary(Base):
     version = Column(Integer)
 
 @event.listens_for(Beneficiary, 'before_insert')
-def user_before_insert(mapper, connection, target):
+def beneficiary_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
 @event.listens_for(Beneficiary, 'before_update')
-def user_before_update(mapper, connection, target):
+def beneficiary_before_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -96,12 +88,12 @@ class Account(Base):
     version = Column(Integer)
 
 @event.listens_for(Account, 'before_insert')
-def user_before_insert(mapper, connection, target):
+def account_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
 @event.listens_for(Account, 'before_update')
-def user_before_update(mapper, connection, target):
+def account_before_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -110,10 +102,10 @@ class Transaction(Base):
     __tablename__ = 'transactions'
 
     id = Column(Integer, primary_key=True)
+    reference = Column(String)
     amount = Column(Float)
     currency = Column(String)
     reason = Column(String)
-    reference = Column(String)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
     beneficiary = Column(Integer, ForeignKey('beneficiaries.id'))
@@ -123,12 +115,36 @@ class Transaction(Base):
     version = Column(Integer)
 
 @event.listens_for(Transaction, 'before_insert')
-def user_before_insert(mapper, connection, target):
+def transaction_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
 @event.listens_for(Transaction, 'before_update')
-def user_before_update(mapper, connection, target):
+def transaction_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
+
+
+class Address(Base):
+    __tablename__ = 'addresses'
+
+    address = Column(String)
+    city = Column(String)
+    state_or_province = Column(String)
+    postal_code = Column(Integer)
+    country = Column(String)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship("User", back_populates="addresses")
+    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'))
+    beneficiary = relationship("Beneficiary", back_populates="addresses")
+
+@event.listens_for(Address, 'before_insert')
+def address_before_insert(mapper, connection, target):
+    target.created_on = datetime.now()
+    target.version = 1
+
+@event.listens_for(Address, 'before_update')
+def address_before_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
