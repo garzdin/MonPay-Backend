@@ -73,9 +73,8 @@ class UserRefreshResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if not 'token' in data or not 'refresh_token' in data:
-            raise HTTPBadRequest(description="Token and refresh token required")
-        token = data['token']
+        if not 'refresh_token' in data:
+            raise HTTPBadRequest(description="Refresh token required")
         refresh_token = data['refresh_token']
         try:
             decoded = decode(refresh_token, SECRET, audience=TOKEN_AUDIENCE)
