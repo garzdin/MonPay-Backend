@@ -4,7 +4,7 @@ from jwt import encode, decode, DecodeError
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
-from models.models import User, session
+from models.models import User, Address, session
 
 __all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
            'UserResetResource', 'UserGetResource', 'UserUpdateResource']
@@ -131,11 +131,11 @@ class UserUpdateResource(object):
         if not user:
             raise HTTPNotFound(description="User not found")
         if 'address' in data['update']:
-            address = session.query(Address).filter(Address.user_id = req.uid)
+            address = session.query(Address).filter(Address.user_id == req.uid)
             address.update(data['update'].pop('address'))
         user.update(data['update'])
         session.commit()
-        user = beneficiary.first()
+        user = user.first()
         resp.body = dumps({"status": True, "user": {
             "id": user.id,
             "email": user.email,
