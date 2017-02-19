@@ -46,7 +46,7 @@ class BeneficiaryCreateResource(object):
             raise HTTPBadRequest(description="Invalid request")
         if 'first_name' not in data or 'last_name' not in data:
             raise HTTPBadRequest(
-                description="Provide all needed required fields")
+                description="Provide all required fields")
         beneficiary = Beneficiary(**data)
         beneficiary.user = req.uid
         session.add(beneficiary)
