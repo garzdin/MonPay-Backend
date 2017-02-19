@@ -11,7 +11,7 @@ class TransactionListResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         """Handles GET requests"""
-        transactions = session.query(Transaction).filter(Transaction.user.id == req.uid)
+        transactions = session.query(Transaction).filter(Transaction.user == req.uid)
         output = [{
             "id": transaction.id,
             "amount": transaction.amount,
@@ -26,7 +26,7 @@ class TransactionGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp, id):
         """Handles GET requests"""
-        transaction = session.query(Transaction).filter(Transaction.user.id == req.uid, Transaction.id == id).first()
+        transaction = session.query(Transaction).filter(Transaction.user == req.uid, Transaction.id == id).first()
         if not transaction:
             raise HTTPNotFound(description="Transaction not found")
         resp.body = dumps({"status": True, "transaction": {
@@ -71,7 +71,7 @@ class TransactionDeleteResource(object):
         if 'id' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        transaction = session.query(Transaction).filter(Transaction.user.id == req.uid, Transaction.id == data['id']).first()
+        transaction = session.query(Transaction).filter(Transaction.user == req.uid, Transaction.id == data['id']).first()
         if not transaction:
             raise HTTPNotFound(description="Transaction not found")
         session.delete(transaction)
