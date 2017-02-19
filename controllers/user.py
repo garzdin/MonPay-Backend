@@ -130,6 +130,9 @@ class UserUpdateResource(object):
         user = session.query(User).filter(User.id == req.uid)
         if not user:
             raise HTTPNotFound(description="User not found")
+        if 'address' in data['update']:
+            address = data['update'].pop('address')
+            user.address.update(address)
         user.update(data['update'])
         session.commit()
         user = beneficiary.first()
