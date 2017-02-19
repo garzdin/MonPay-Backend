@@ -44,7 +44,7 @@ class BeneficiaryCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'first_name' not in data or 'last_name' not in data or 'country' not in data:
+        if 'first_name' not in data or 'last_name' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
         beneficiary = Beneficiary(**data)
