@@ -127,7 +127,7 @@ class UserUpdateResource(object):
         if 'id' not in data or 'update' not in data:
             raise HTTPBadRequest(
                 description="Provide all needed required fields")
-        user = session.query(User).filter(User.user == req.uid)
+        user = session.query(User).filter(User.id == req.uid)
         if not user:
             raise HTTPNotFound(description="User not found")
         user.update(data['update'])
