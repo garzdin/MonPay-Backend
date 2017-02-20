@@ -19,5 +19,6 @@ else:
 
 # Token related settings
 TOKEN_EXPIRATION = timedelta(hours=1)
+REFRESH_TOKEN_EXPIRATION = timedelta(days=7)
 TOKEN_ISSUER = 'MonPay Ltd.'
 TOKEN_AUDIENCE = 'MonPay Client'

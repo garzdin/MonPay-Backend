@@ -2,7 +2,7 @@ from json import load, dumps
 from datetime import datetime
 from jwt import encode, decode, DecodeError
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
-from settings import SECRET, TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
+from settings import SECRET, TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
 from models.models import User, Address, session
 
@@ -59,6 +59,7 @@ class UserLoginResource(object):
             "iss": TOKEN_ISSUER,
             "aud": TOKEN_AUDIENCE,
             "iat": datetime.utcnow(),
+            "exp": datetime.utcnow() + REFRESH_TOKEN_EXPIRATION,
             "uid": user.id
         }
         token = encode(token_data, SECRET)
@@ -84,7 +85,10 @@ class UserRefreshResource(object):
             new_token_data = decoded
             new_token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
             new_token = encode(new_token_data, SECRET)
-        resp.body = dumps({"status": True, "token": new_token.decode("utf-8"), "refresh_token": refresh_token})
+            new_refresh_token_data = decoded
+            new_refresh_token_data['exp'] = datetime.utcnow() + REFRESH_TOKEN_EXPIRATION
+            new_refresh_token = encode(new_refresh_token_data, SECRET)
+        resp.body = dumps({"status": True, "token": new_token.decode("utf-8"), "refresh_token": new_refresh_token.decode("utf-8")})
 
 
 class UserResetResource(object):
