@@ -124,22 +124,13 @@ class UserUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data or 'update' not in data:
-            raise HTTPBadRequest(
-                description="Provide all needed required fields")
         user = session.query(User).filter(User.id == req.uid)
         if not user:
             raise HTTPNotFound(description="User not found")
-        if 'address' in data['update']:
-            address = session.query(Address).filter(Address.user_id == req.uid)
-            address.update(data['update'].pop('address'))
-        user.update(data['update'])
-        session.commit()
-        user = user.first()
-        resp.body = dumps({"status": True, "user": {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "registered_on": str(user.created_on)
-        }})
+        schema = UserSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        user.update(result.data)
+        result = schema.dump(user.first())
+        resp.body = dumps({"status": True, "user": result.data}, cls=DateTimeEncoder)
