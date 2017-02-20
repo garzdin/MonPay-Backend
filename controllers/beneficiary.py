@@ -27,7 +27,7 @@ class BeneficiaryGetResource(object):
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
         schema = BeneficiarySchema()
-        resp.body = dumps({"beneficiary": schema.load(beneficiary).data}, cls=DateTimeEncoder)
+        resp.body = dumps({"beneficiary": schema.dump(beneficiary).data}, cls=DateTimeEncoder)
 
 
 class BeneficiaryCreateResource(object):

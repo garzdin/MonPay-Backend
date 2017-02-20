@@ -27,7 +27,7 @@ class AccountGetResource(object):
         if not account:
             raise HTTPNotFound(description="Account not found")
         schema = AccountSchema()
-        resp.body = dumps({"account": schema.load(account).data}, cls=DateTimeEncoder)
+        resp.body = dumps({"account": schema.dump(account).data}, cls=DateTimeEncoder)
 
 
 class AccountCreateResource(object):
