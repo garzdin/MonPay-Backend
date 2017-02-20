@@ -19,8 +19,6 @@ class UserCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if not 'email' in data or not 'password' in data:
-            raise HTTPBadRequest(description="Email and password required")
         user = session.query(User).filter(User.email == data['email']).first()
         if user:
             raise HTTPConflict(description="Email already exists")
