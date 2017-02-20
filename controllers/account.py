@@ -1,7 +1,9 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
+from encoders.datetime import DateTimeEncoder
 from models.models import Account, session
+from models.schema import AccountSchema
 
 __all__ = ['AccountListResource', 'AccountGetResource',
            'AccountCreateResource', 'AccountUpdateResource',
@@ -13,14 +15,8 @@ class AccountListResource(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
         accounts = session.query(Account).filter(Account.user == req.uid)
-        output = [{
-            "id": account.id,
-            "iban": account.iban,
-            "bic_swift": account.bic_swift,
-            "currency": account.currency,
-            "country": account.country
-        } for account in accounts]
-        resp.body = dumps({"status": True, "accounts": output})
+        schema = AccountSchema(many=True)
+        resp.body = dumps({"accounts": schema.dump(accounts).data})
 
 
 class AccountGetResource(object):
@@ -30,13 +26,8 @@ class AccountGetResource(object):
         account = session.query(Account).filter(Account.user == req.uid, Account.id == id).first()
         if not account:
             raise HTTPNotFound(description="Account not found")
-        resp.body = dumps({"status": True, "account": {
-            "id": account.id,
-            "iban": account.iban,
-            "bic_swift": account.bic_swift,
-            "currency": account.currency,
-            "country": account.country
-        }})
+        schema = AccountSchema(many=True)
+        resp.body = dumps({"account": schema.load(account).data})
 
 
 class AccountCreateResource(object):
@@ -46,20 +37,16 @@ class AccountCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'iban' not in data or 'bic_swift' not in data or 'currency' not in data or not 'country' in data:
-            raise HTTPBadRequest(
-                description="Provide all needed required fields")
-        account = Account(**data)
+        schema = AccountSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        account = Account(**result.data)
         account.user = req.uid
         session.add(account)
         session.commit()
-        resp.body = dumps({"status": True, "account": {
-            "id": account.id,
-            "iban": account.iban,
-            "bic_swift": account.bic_swift,
-            "currency": account.currency,
-            "country": account.country
-        }})
+        result = schema.dump(account)
+        resp.body = dumps({"account": result.data}, cls=DateTimeEncoder)
 
 
 class AccountUpdateResource(object):
@@ -69,22 +56,17 @@ class AccountUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data or 'update' not in data:
-            raise HTTPBadRequest(
-                description="Provide all needed required fields")
         account = session.query(Account).filter(Account.user == req.uid, Account.id == data['id'])
         if not account:
             raise HTTPNotFound(description="Account not found")
-        account.update(data['update'])
+        schema = AccountSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        account.update(result.data)
         session.commit()
-        account = account.first()
-        resp.body = dumps({"status": True, "account": {
-            "id": account.id,
-            "iban": account.iban,
-            "bic_swift": account.bic_swift,
-            "currency": account.currency,
-            "country": account.country
-        }})
+        result = schema.dump(account.first())
+        resp.body = dumps({"account": result.data}, cls=DateTimeEncoder)
 
 
 class AccountDeleteResource(object):
@@ -100,12 +82,8 @@ class AccountDeleteResource(object):
         account = session.query(Account).filter(Account.user == req.uid, Account.id == data['id']).first()
         if not account:
             raise HTTPNotFound(description="Account not found")
+        schema = AccountSchema()
         session.delete(account)
         session.commit()
-        resp.body = dumps({"status": True, "account": {
-            "id": account.id,
-            "iban": account.iban,
-            "bic_swift": account.bic_swift,
-            "currency": account.currency,
-            "country": account.country
-        }})
+        result = schema.dump(account)
+        resp.body = dumps({"account": result.data}, cls=DateTimeEncoder)
