@@ -4,7 +4,9 @@ from jwt import encode, decode, DecodeError
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
+from encoders.datetime import DateTimeEncoder
 from models.models import User, Address, session
+from models.schema import UserSchema
 
 __all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
            'UserResetResource', 'UserGetResource', 'UserUpdateResource']
@@ -22,16 +24,15 @@ class UserCreateResource(object):
         user = session.query(User).filter(User.email == data['email']).first()
         if user:
             raise HTTPConflict(description="Email already exists")
-        user = User(**data)
+        schema = UserSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        user = User(**result.data)
         session.add(user)
         session.commit()
-        resp.body = dumps({"status": True, "user": {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "registered_on": str(user.created_on)
-        }})
+        result = schema.dump(user)
+        resp.body = dumps({"status": True, "user": result.data}, cls=DateTimeEncoder)
 
 
 class UserLoginResource(object):
@@ -112,13 +113,8 @@ class UserGetResource(object):
         user = session.query(User).get(req.uid)
         if not user:
             raise HTTPNotFound(description="User not found")
-        resp.body = dumps({"status": True, "user": {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "registered_on": str(user.created_on)
-        }})
+        schema = UserSchema()
+        resp.body = dumps({"status": True, "user": schema.dump(user).data})
 
 
 class UserUpdateResource(object):
