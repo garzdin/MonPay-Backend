@@ -1,7 +1,9 @@
 from json import load, dumps
 from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
+from encoders.datetime import DateTimeEncoder
 from models.models import Beneficiary, session
+from models.schema import BeneficiarySchema
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
@@ -13,13 +15,8 @@ class BeneficiaryListResource(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
         beneficiaries = session.query(Beneficiary).filter(Beneficiary.user == req.uid)
-        output = [{
-            "id": beneficiary.id,
-            "first_name": beneficiary.first_name,
-            "last_name": beneficiary.last_name,
-            "email": beneficiary.email
-        } for beneficiary in beneficiaries]
-        resp.body = dumps({"status": True, "beneficiaries": output})
+        schema = BeneficiarySchema(many=True)
+        resp.body = dumps({"beneficiaries": schema.dump(beneficiaries).data}, cls=DateTimeEncoder)
 
 
 class BeneficiaryGetResource(object):
@@ -29,12 +26,8 @@ class BeneficiaryGetResource(object):
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == id).first()
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
-        resp.body = dumps({"status": True, "beneficiary": {
-            "id": beneficiary.id,
-            "first_name": beneficiary.first_name,
-            "last_name": beneficiary.last_name,
-            "email": beneficiary.email
-        }})
+        schema = BeneficiarySchema()
+        resp.body = dumps({"beneficiary": schema.load(beneficiary).data}, cls=DateTimeEncoder)
 
 
 class BeneficiaryCreateResource(object):
@@ -44,19 +37,16 @@ class BeneficiaryCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'first_name' not in data or 'last_name' not in data:
-            raise HTTPBadRequest(
-                description="Provide all required fields")
-        beneficiary = Beneficiary(**data)
+        schema = BeneficiarySchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        beneficiary = Beneficiary(**result.data)
         beneficiary.user = req.uid
         session.add(beneficiary)
         session.commit()
-        resp.body = dumps({"status": True, "beneficiary": {
-            "id": beneficiary.id,
-            "first_name": beneficiary.first_name,
-            "last_name": beneficiary.last_name,
-            "email": beneficiary.email
-        }})
+        result = schema.dump(beneficiary)
+        resp.body = dumps({"beneficiary": result.data}, cls=DateTimeEncoder)
 
 
 class BeneficiaryUpdateResource(object):
@@ -66,21 +56,17 @@ class BeneficiaryUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if 'id' not in data or 'update' not in data:
-            raise HTTPBadRequest(
-                description="Provide all needed required fields")
         beneficiary = session.query(Beneficiary).filter(Beneficiary.user == req.uid, Beneficiary.id == data['id'])
         if not beneficiary:
             raise HTTPNotFound(description="Beneficiary not found")
-        beneficiary.update(data['update'])
+        schema = BeneficiarySchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        beneficiary.update(result.data)
         session.commit()
-        beneficiary = beneficiary.first()
-        resp.body = dumps({"status": True, "beneficiary": {
-            "id": beneficiary.id,
-            "first_name": beneficiary.first_name,
-            "last_name": beneficiary.last_name,
-            "email": beneficiary.email
-        }})
+        result = schema.dump(beneficiary.first())
+        resp.body = dumps({"beneficiary": result.data}, cls=DateTimeEncoder)
 
 
 class BeneficiaryDeleteResource(object):
