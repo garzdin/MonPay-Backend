@@ -16,7 +16,7 @@ class AccountListResource(object):
         """Handles GET requests"""
         accounts = session.query(Account).filter(Account.user == req.uid)
         schema = AccountSchema(many=True)
-        resp.body = dumps({"accounts": schema.dump(accounts).data})
+        resp.body = dumps({"accounts": schema.dump(accounts).data}, cls=DateTimeEncoder)
 
 
 class AccountGetResource(object):
@@ -26,8 +26,8 @@ class AccountGetResource(object):
         account = session.query(Account).filter(Account.user == req.uid, Account.id == id).first()
         if not account:
             raise HTTPNotFound(description="Account not found")
-        schema = AccountSchema(many=True)
-        resp.body = dumps({"account": schema.load(account).data})
+        schema = AccountSchema()
+        resp.body = dumps({"account": schema.load(account).data}, cls=DateTimeEncoder)
 
 
 class AccountCreateResource(object):
