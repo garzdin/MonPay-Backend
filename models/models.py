@@ -72,7 +72,6 @@ class Beneficiary(Base, Id, Entity, Identity, Version, Phone):
     __tablename__ = 'beneficiaries'
 
     email = Column(String)
-    address = relationship("Address", uselist=False, back_populates="beneficiary")
     user = Column(Integer, ForeignKey('users.id'))
     accounts = relationship("Account")
     transactions = relationship("Transaction")
@@ -92,7 +91,7 @@ class Account(Base, Id, Version):
     __tablename__ = 'accounts'
 
     iban = Column(String, nullable=False)
-    bic_swift = Column(String, nullable=False)
+    bic_swift = Column(String)
     currency = Column(String)
     country = Column(String)
     user = Column(Integer, ForeignKey('users.id'))
@@ -143,8 +142,6 @@ class Address(Base, Id, Version):
     country = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="address")
-    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'))
-    beneficiary = relationship("Beneficiary", back_populates="address")
 
 @event.listens_for(Address, 'before_insert')
 def address_before_insert(mapper, connection, target):

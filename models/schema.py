@@ -42,7 +42,6 @@ class UserSchema(Schema, Id, Entity, Identity, Version, Phone):
 
 class BeneficiarySchema(Schema, Id, Entity, Identity, Version, Phone):
     email = fields.Email(required=True)
-    address = fields.Nested('AddressSchema')
     user = fields.Integer()
     accounts = fields.Nested('AccountSchema', many=True)
     transactions = fields.Nested('TransactionSchema', many=True)
@@ -77,5 +76,3 @@ class AddressSchema(Schema, Id, Version):
     country = fields.Str(required=True)
     user_id = fields.Integer()
     user = fields.Nested('UserSchema')
-    beneficiary_id = fields.Integer()
-    beneficiary = fields.Nested('BeneficiarySchema')
