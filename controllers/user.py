@@ -29,6 +29,7 @@ class UserCreateResource(object):
         user = User(**result.data)
         session.add(user)
         session.commit()
+        schema = UserSchema(exclude=('password',))
         result = schema.dump(user)
         resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
 
@@ -109,7 +110,7 @@ class UserGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         user = session.query(User).get(req.uid)
-        schema = UserSchema()
+        schema = UserSchema(exclude=('password',))
         resp.body = dumps({"user": schema.dump(user).data})
 
 
@@ -126,5 +127,6 @@ class UserUpdateResource(object):
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
         user.update(result.data)
+        schema = UserSchema(exclude=('password',))
         result = schema.dump(user.first())
         resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
