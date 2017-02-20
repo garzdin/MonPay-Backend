@@ -72,9 +72,6 @@ class Beneficiary(Base, Id, Entity, Identity, Version):
     user = Column(Integer, ForeignKey('users.id'))
     accounts = relationship("Account")
     transactions = relationship("Transaction")
-    created_on = Column(DateTime)
-    updated_on = Column(DateTime)
-    version = Column(Integer)
 
 @event.listens_for(Beneficiary, 'before_insert')
 def beneficiary_before_insert(mapper, connection, target):
