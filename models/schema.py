@@ -27,7 +27,7 @@ class Entity(object):
 
 
 class Phone(object):
-    phone_number = field.Str()
+    phone_number = fields.Str()
 
 
 class UserSchema(Schema, Id, Entity, Identity, Version, Phone):
