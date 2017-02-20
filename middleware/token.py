@@ -14,9 +14,9 @@ def validate_token(req, resp, resource, param):
     try:
         decoded = decode(token, SECRET, audience=TOKEN_AUDIENCE)
     except ExpiredSignatureError as e:
-        raise HTTPBadRequest('Bad Request', 'Token has expired')
+        raise HTTPBadRequest(description={"token": "Token has expired"})
     except DecodeError as e:
-        raise HTTPBadRequest('Bad Request', 'Token could not be decoded')
+        raise HTTPBadRequest(description={"token": "Token could not be decoded"})
     else:
         user = session.query(User).get(decoded['uid'])
         if not user:

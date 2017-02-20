@@ -1,6 +1,6 @@
 from json import load, dumps
 from datetime import datetime
-from jwt import encode, decode, DecodeError
+from jwt import encode, decode, ExpiredSignatureError, DecodeError
 from falcon import HTTPBadRequest, HTTPConflict, HTTPNotFound, HTTPForbidden, before
 from settings import SECRET, TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, TOKEN_ISSUER, TOKEN_AUDIENCE
 from middleware.token import validate_token
@@ -79,8 +79,10 @@ class UserRefreshResource(object):
         refresh_token = data['refresh_token']
         try:
             decoded = decode(refresh_token, SECRET, audience=TOKEN_AUDIENCE)
+        except ExpiredSignatureError as e:
+            raise HTTPBadRequest(description={"refresh_token": "Token has expired"})
         except DecodeError as e:
-            raise HTTPBadRequest(description="Could not decode refresh token")
+            raise HTTPBadRequest(description={"refresh_token": "Token could not be decoded"})
         else:
             new_token_data = decoded
             new_token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
