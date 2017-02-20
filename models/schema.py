@@ -26,7 +26,11 @@ class Entity(object):
     date_of_birth = fields.Date(required=True)
 
 
-class UserSchema(Schema, Id, Entity, Identity, Version):
+class Phone(object):
+    phone_number = field.Str()
+
+
+class UserSchema(Schema, Id, Entity, Identity, Version, Phone):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
     address = fields.Nested('AddressSchema')
@@ -36,7 +40,7 @@ class UserSchema(Schema, Id, Entity, Identity, Version):
     transactions = fields.Nested('TransactionSchema', many=True)
 
 
-class BeneficiarySchema(Schema, Id, Entity, Identity, Version):
+class BeneficiarySchema(Schema, Id, Entity, Identity, Version, Phone):
     email = fields.Email(required=True)
     address = fields.Nested('AddressSchema')
     user = fields.Integer()

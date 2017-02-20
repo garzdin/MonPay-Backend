@@ -42,7 +42,11 @@ class Entity(object):
     date_of_birth = Column(Date)
 
 
-class User(Base, Id, Entity, Identity, Version):
+class Phone(object):
+    phone_number = Column(String)
+
+
+class User(Base, Id, Entity, Identity, Version, Phone):
     __tablename__ = 'users'
 
     email = Column(String, nullable=False, unique=True)
@@ -64,7 +68,7 @@ def user_before_update(mapper, connection, target):
     target.version += 1
 
 
-class Beneficiary(Base, Id, Entity, Identity, Version):
+class Beneficiary(Base, Id, Entity, Identity, Version, Phone):
     __tablename__ = 'beneficiaries'
 
     email = Column(String)
