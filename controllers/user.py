@@ -109,8 +109,6 @@ class UserGetResource(object):
     @before(validate_token)
     def on_get(self, req, resp):
         user = session.query(User).get(req.uid)
-        if not user:
-            raise HTTPNotFound(description="User not found")
         schema = UserSchema()
         resp.body = dumps({"user": schema.dump(user).data})
 
@@ -123,8 +121,6 @@ class UserUpdateResource(object):
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
         user = session.query(User).filter(User.id == req.uid)
-        if not user:
-            raise HTTPNotFound(description="User not found")
         schema = UserSchema()
         result = schema.load(data)
         if result.errors:

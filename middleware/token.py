@@ -1,7 +1,8 @@
 from json import dumps
 from jwt import decode, ExpiredSignatureError, DecodeError
-from falcon import HTTPBadRequest
+from falcon import HTTPBadRequest, HTTPNotFound
 from settings import SECRET, TOKEN_AUDIENCE
+from models.models import User, session
 
 __all__ = ['validate_token']
 
@@ -17,4 +18,7 @@ def validate_token(req, resp, resource, param):
     except DecodeError as e:
         raise HTTPBadRequest('Bad Request', 'Token could not be decoded')
     else:
-        req.uid = int(decoded['uid'])
+        user = session.query(User).get(decoded['uid'])
+        if not user:
+            raise HTTPNotFound(description="User not found")
+        req.uid = int(decoded['uid']) # TODO: Maybe add user object to session
