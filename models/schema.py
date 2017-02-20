@@ -1,5 +1,9 @@
 from marshmallow import Schema, fields
 
+__all__ = ['UserSchema', 'BeneficiarySchema', 'AccountSchema',
+           'TransactionSchema', 'AddressSchema']
+
+
 class Id(object):
     id = fields.Integer()
 
@@ -33,7 +37,6 @@ class UserSchema(Schema, Id, Entity, Identity, Version):
 
 
 class BeneficiarySchema(Schema, Id, Entity, Identity, Version):
-
     email = fields.Email(required=True)
     address = fields.Nested('AddressSchema')
     user = fields.Integer()
