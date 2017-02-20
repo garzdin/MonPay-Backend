@@ -32,7 +32,7 @@ class UserCreateResource(object):
         session.add(user)
         session.commit()
         result = schema.dump(user)
-        resp.body = dumps({"status": True, "user": result.data}, cls=DateTimeEncoder)
+        resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
 
 
 class UserLoginResource(object):
@@ -65,7 +65,7 @@ class UserLoginResource(object):
         }
         token = encode(token_data, SECRET)
         refresh_token = encode(refresh_token_data, SECRET)
-        resp.body = dumps({"status": True, "token": token.decode("utf-8"), "refresh_token": refresh_token.decode("utf-8")})
+        resp.body = dumps({"token": token.decode("utf-8"), "refresh_token": refresh_token.decode("utf-8")})
 
 
 class UserRefreshResource(object):
@@ -89,7 +89,7 @@ class UserRefreshResource(object):
             new_refresh_token_data = decoded
             new_refresh_token_data['exp'] = datetime.utcnow() + REFRESH_TOKEN_EXPIRATION
             new_refresh_token = encode(new_refresh_token_data, SECRET)
-        resp.body = dumps({"status": True, "token": new_token.decode("utf-8"), "refresh_token": new_refresh_token.decode("utf-8")})
+        resp.body = dumps({"token": new_token.decode("utf-8"), "refresh_token": new_refresh_token.decode("utf-8")})
 
 
 class UserResetResource(object):
@@ -114,7 +114,7 @@ class UserGetResource(object):
         if not user:
             raise HTTPNotFound(description="User not found")
         schema = UserSchema()
-        resp.body = dumps({"status": True, "user": schema.dump(user).data})
+        resp.body = dumps({"user": schema.dump(user).data})
 
 
 class UserUpdateResource(object):
@@ -133,4 +133,4 @@ class UserUpdateResource(object):
             raise HTTPBadRequest(description=result.errors)
         user.update(result.data)
         result = schema.dump(user.first())
-        resp.body = dumps({"status": True, "user": result.data}, cls=DateTimeEncoder)
+        resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
