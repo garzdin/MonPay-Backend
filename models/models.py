@@ -73,8 +73,7 @@ class Beneficiary(Base, Id, Entity, Identity, Version, Phone):
 
     email = Column(String)
     user = Column(Integer, ForeignKey('users.id'))
-    accounts = relationship("Account")
-    transactions = relationship("Transaction")
+    account = relationship("Account", uselist=False)
 
 @event.listens_for(Beneficiary, 'before_insert')
 def beneficiary_before_insert(mapper, connection, target):
@@ -118,7 +117,6 @@ class Transaction(Base, Id, Version):
     reason = Column(String)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
-    beneficiary = Column(Integer, ForeignKey('beneficiaries.id'))
     account = Column(Integer, ForeignKey('accounts.id'))
 
 @event.listens_for(Transaction, 'before_insert')
