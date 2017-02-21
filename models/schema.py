@@ -45,6 +45,7 @@ class BeneficiarySchema(Schema, Id, Entity, Phone, Identity, Version):
     email = fields.Email(required=True)
     user = fields.Integer()
     account = fields.Nested('AccountSchema')
+    transactions = fields.Nested('TransactionSchema')
 
 
 class AccountSchema(Schema, Id, Version):
@@ -64,6 +65,7 @@ class TransactionSchema(Schema, Id, Version):
     reason = fields.Str(required=True)
     completed = fields.Boolean(default=False)
     user = fields.Integer()
+    beneficiary = fields.Integer()
     account = fields.Integer()
 
 
