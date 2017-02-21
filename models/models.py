@@ -121,7 +121,7 @@ class Transaction(Base, Id, Version):
     reason = Column(String)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
-    beneficiary = Column(ForeignKey('beneficiaries.id'))
+    beneficiary = Column(Integer, ForeignKey('beneficiaries.id'))
     account = Column(Integer, ForeignKey('accounts.id'))
 
 @event.listens_for(Transaction, 'before_insert')
