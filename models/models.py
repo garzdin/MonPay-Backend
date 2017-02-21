@@ -14,10 +14,23 @@ class Id(object):
     id = Column(Integer, primary_key=True)
 
 
-class Version(object):
-    created_on = Column(DateTime)
-    updated_on = Column(DateTime)
-    version = Column(Integer)
+class Entity(object):
+    entity_type = {
+        0: "private",
+        1: "company"
+    }
+
+    entity_type = Column(Integer, default=0)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+
+
+class Birth(object):
+    date_of_birth = Column(Date)
+
+
+class Phone(object):
+    phone_number = Column(String)
 
 
 class Identity(object):
@@ -30,23 +43,13 @@ class Identity(object):
     id_value = Column(String)
 
 
-class Entity(object):
-    entity_type = {
-        0: "private",
-        1: "company"
-    }
-
-    entity_type = Column(Integer)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    date_of_birth = Column(Date)
+class Version(object):
+    created_on = Column(DateTime)
+    updated_on = Column(DateTime)
+    version = Column(Integer)
 
 
-class Phone(object):
-    phone_number = Column(String)
-
-
-class User(Base, Id, Entity, Identity, Version, Phone):
+class User(Base, Id, Entity, Birth, Phone, Identity, Version):
     __tablename__ = 'users'
 
     email = Column(String, nullable=False, unique=True)
@@ -68,7 +71,7 @@ def user_before_update(mapper, connection, target):
     target.version += 1
 
 
-class Beneficiary(Base, Id, Entity, Identity, Version, Phone):
+class Beneficiary(Base, Id, Entity, Phone, Identity, Version):
     __tablename__ = 'beneficiaries'
 
     email = Column(String)

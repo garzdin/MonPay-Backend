@@ -8,29 +8,30 @@ class Id(object):
     id = fields.Integer()
 
 
-class Version(object):
-    created_on = fields.DateTime(dump_only=True)
-    updated_on = fields.DateTime(dump_only=True)
-    version = fields.Integer(dump_only=True)
+class Entity(object):
+    entity_type = fields.Integer(required=True)
+    first_name = fields.Str(required=True)
+    last_name = fields.Str(required=True)
 
+
+class Birth(object):
+    date_of_birth = fields.Date(required=True)
+
+class Phone(object):
+    phone_number = fields.Str()
 
 class Identity(object):
     id_type = fields.Integer()
     id_value = fields.Str()
 
 
-class Entity(object):
-    entity_type = fields.Integer(required=True)
-    first_name = fields.Str(required=True)
-    last_name = fields.Str(required=True)
-    date_of_birth = fields.Date(required=True)
+class Version(object):
+    created_on = fields.DateTime(dump_only=True)
+    updated_on = fields.DateTime(dump_only=True)
+    version = fields.Integer(dump_only=True)
 
 
-class Phone(object):
-    phone_number = fields.Str()
-
-
-class UserSchema(Schema, Id, Entity, Identity, Version, Phone):
+class UserSchema(Schema, Id, Entity, Birth, Phone, Identity, Version):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
     address = fields.Nested('AddressSchema')
@@ -40,7 +41,7 @@ class UserSchema(Schema, Id, Entity, Identity, Version, Phone):
     transactions = fields.Nested('TransactionSchema', many=True)
 
 
-class BeneficiarySchema(Schema, Id, Entity, Identity, Version, Phone):
+class BeneficiarySchema(Schema, Id, Entity, Phone, Identity, Version):
     email = fields.Email(required=True)
     user = fields.Integer()
     account = fields.Nested('AccountSchema')
