@@ -42,6 +42,7 @@ class AccountCreateResource(object):
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
         account = Account(**result.data)
+        account.user = req.uid
         session.add(account)
         session.commit()
         result = schema.dump(account)
