@@ -21,4 +21,4 @@ def validate_token(req, resp, resource, param):
         user = session.query(User).get(decoded['uid'])
         if not user:
             raise HTTPNotFound(description="User not found")
-        req.uid = int(decoded['uid']) # TODO: Maybe add user object to session
+        req.uid = int(decoded['uid'])
