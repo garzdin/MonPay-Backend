@@ -53,6 +53,7 @@ class AccountSchema(Schema, Id, Version):
     bic_swift = fields.Str()
     currency = fields.Str(required=True)
     country = fields.Str(required=True)
+    active = fields.Boolean(default=False)
     user = fields.Integer()
     beneficiary = fields.Integer()
     transactions = fields.Nested('TransactionSchema', many=True)

@@ -7,7 +7,7 @@ from models.schema import AccountSchema
 
 __all__ = ['AccountListResource', 'AccountGetResource',
            'AccountCreateResource', 'AccountUpdateResource',
-           'AccountDeleteResource']
+           'AccountUpdateStatusResource', 'AccountDeleteResource']
 
 
 class AccountListResource(object):
@@ -67,6 +67,20 @@ class AccountUpdateResource(object):
         result = schema.dump(account.first())
         resp.body = dumps({"account": result.data}, cls=DateTimeEncoder)
 
+
+class AccountUpdateStatusResource(object):
+    @before(validate_token)
+    def on_get(self, req, resp, id):
+        account = session.query(Account).filter(Account.user == req.uid, Account.id == id).first()
+        if not account:
+            raise HTTPNotFound(description="Account not found")
+        session.query(Account).filter(Account.user == req.uid).update({"active": False})
+        account.active = True
+        session.commit()
+        session.refresh(account)
+        schema = AccountSchema()
+        result = schema.dump(account)
+        resp.body = dumps({"account": result.data}, cls=DateTimeEncoder)
 
 class AccountDeleteResource(object):
     @before(validate_token)

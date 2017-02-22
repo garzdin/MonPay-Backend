@@ -97,6 +97,7 @@ class Account(Base, Id, Version):
     bic_swift = Column(String)
     currency = Column(String)
     country = Column(String)
+    active = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
     beneficiary = Column(Integer, ForeignKey('beneficiaries.id'))
     transactions = relationship("Transaction")
