@@ -19,7 +19,7 @@ class UserCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        user = session.query(User).filter(User.email == data['email']).first()
+        user = session.query(User).filter(User.email == data.get('email')).first()
         if user:
             raise HTTPConflict(description="Email already exists")
         schema = UserSchema()

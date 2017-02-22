@@ -18,7 +18,7 @@ def validate_token(req, resp, resource, param):
     except DecodeError as e:
         raise HTTPBadRequest(description={"token": "Token could not be decoded"})
     else:
-        user = session.query(User).get(decoded['uid'])
+        user = session.query(User).get(decoded.get('uid'))
         if not user:
             raise HTTPNotFound(description="User not found")
-        req.uid = int(decoded['uid'])
+        req.uid = int(decoded.get('uid'))
