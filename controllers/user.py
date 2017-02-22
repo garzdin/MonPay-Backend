@@ -85,7 +85,7 @@ class UserRefreshResource(object):
         except DecodeError as e:
             raise HTTPBadRequest(description={"refresh_token": "Token could not be decoded"})
         else:
-            user = session.query(User).get(req.get('uid'))
+            user = session.query(User).get(req.uid)
             if not user:
                 raise HTTPNotFound(description={"user": "User not found"})
             new_token_data = decoded
