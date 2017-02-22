@@ -124,7 +124,7 @@ class UserUpdateResource(object):
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
         user = session.query(User).filter(User.id == req.uid)
-        schema = UserSchema()
+        schema = UserSchema(exclude=('password', 'entity_type', 'email', 'first_name', 'last_name', 'date_of_birth'))
         result = schema.load(data)
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
