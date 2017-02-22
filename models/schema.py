@@ -76,5 +76,4 @@ class AddressSchema(Schema, Id, Version):
     state_or_province = fields.Str()
     postal_code = fields.Integer(required=True)
     country = fields.Str(required=True)
-    user_id = fields.Integer()
-    user = fields.Nested('UserSchema')
+    user = fields.Integer()

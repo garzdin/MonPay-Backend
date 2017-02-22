@@ -54,7 +54,7 @@ class User(Base, Id, Entity, Birth, Phone, Identity, Version):
 
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    address = relationship("Address", uselist=False, back_populates="user")
+    address = relationship("Address", uselist=False)
     is_admin = Column(Boolean, default=False)
     accounts = relationship("Account")
     beneficiaries = relationship("Beneficiary")
@@ -144,8 +144,7 @@ class Address(Base, Id, Version):
     state_or_province = Column(String)
     postal_code = Column(Integer)
     country = Column(String)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship("User", back_populates="address")
+    user = Column(Integer, ForeignKey('users.id'))
 
 @event.listens_for(Address, 'before_insert')
 def address_before_insert(mapper, connection, target):

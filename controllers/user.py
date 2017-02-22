@@ -6,10 +6,11 @@ from settings import SECRET, TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, TOKEN_I
 from middleware.token import validate_token
 from encoders.datetime import DateTimeEncoder
 from models.models import User, Address, session
-from models.schema import UserSchema
+from models.schema import UserSchema, AddressSchema
 
 __all__ = ['UserCreateResource', 'UserLoginResource', 'UserRefreshResource',
-           'UserResetResource', 'UserGetResource', 'UserUpdateResource']
+           'UserResetResource', 'UserGetResource', 'UserUpdateResource',
+           'UserAddressResource']
 
 
 class UserCreateResource(object):
@@ -131,4 +132,24 @@ class UserUpdateResource(object):
         user.update(result.data)
         schema = UserSchema(exclude=('password',))
         result = schema.dump(user.first())
+        resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
+
+
+class UserAddressResource(object):
+    @before(validate_token)
+    def on_post(self, req, resp):
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request")
+        user = session.query(User).get(req.uid)
+        schema = AddressSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        address = Address(**result.data)
+        address.user = req.uid
+        session.add(address)
+        session.commit()
+        result = schema.dump(address)
         resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
