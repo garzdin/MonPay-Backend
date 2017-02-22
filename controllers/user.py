@@ -87,7 +87,7 @@ class UserRefreshResource(object):
         else:
             user = session.query(User).get(req.get('uid'))
             if not user:
-                raise HTTPNotFound(description="User not found")
+                raise HTTPNotFound(description={"user": "User not found"})
             new_token_data = decoded
             new_token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
             new_token = encode(new_token_data, SECRET)
