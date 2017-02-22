@@ -85,6 +85,9 @@ class UserRefreshResource(object):
         except DecodeError as e:
             raise HTTPBadRequest(description={"refresh_token": "Token could not be decoded"})
         else:
+            user = session.query(User).get(req.get('uid'))
+            if not user:
+                raise HTTPNotFound(description="User not found")
             new_token_data = decoded
             new_token_data['exp'] = datetime.utcnow() + TOKEN_EXPIRATION
             new_token = encode(new_token_data, SECRET)
