@@ -20,17 +20,17 @@ class UserCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        if not 'address' in data:
-            raise HTTPBadRequest(description={"address": "Address is required"})
         user = session.query(User).filter(User.email == data.get('email')).first()
         if user:
             raise HTTPConflict(description="Email already exists")
+        if not 'address' in data:
+            raise HTTPBadRequest(description={"address": "Address is required"})
         address = data.pop('address')
         schema = UserSchema()
         result = schema.load(data)
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
-        addressSchema = addressSchema()
+        addressSchema = AddressSchema()
         addressResult = addressSchema.load(address)
         if addressResult.errors:
             raise HTTPBadRequest(description=addressResult.errors)
@@ -38,6 +38,7 @@ class UserCreateResource(object):
         session.add(user)
         session.commit()
         address = Address(**addressResult.data)
+        session.refresh(user)
         address.user = user.id
         session.add(address)
         session.commit()
