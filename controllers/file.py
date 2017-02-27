@@ -12,4 +12,4 @@ class FileUploadResource(object):
         with open("{name}.jpg".format(name=filename), 'wb+') as f:
             while True:
                 f.write(stream.read(1024))
-        resp.body = dumps({"status": True})
+        resp.body = dumps({"file", "{name}.jpg".format(name=filename)})
