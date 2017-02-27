@@ -1,5 +1,4 @@
 from falcon import API
-from middleware.multipart import MultipartMiddleware
 from controllers.file import *
 from controllers.user import *
 from controllers.beneficiary import *
@@ -8,7 +7,7 @@ from controllers.account import *
 
 __all__ = ['app']
 
-app = API(middleware=[MultipartMiddleware()])
+app = API()
 app.add_route('/api/v1/upload/file', FileUploadResource())
 app.add_route('/api/v1/auth/create', UserCreateResource())
 app.add_route('/api/v1/auth/login', UserLoginResource())
