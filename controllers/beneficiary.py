@@ -3,7 +3,7 @@ from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
 from encoders.datetime import DateTimeEncoder
 from models.models import Beneficiary, Account, session
-from models.schema import BeneficiarySchema, accountSchema
+from models.schema import BeneficiarySchema, AccountSchema
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
