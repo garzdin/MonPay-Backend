@@ -2,8 +2,8 @@ from json import load, dumps
 from falcon import HTTPBadRequest, HTTPNotFound, before
 from middleware.token import validate_token
 from encoders.datetime import DateTimeEncoder
-from models.models import Beneficiary, session
-from models.schema import BeneficiarySchema
+from models.models import Beneficiary, Account, session
+from models.schema import BeneficiarySchema, accountSchema
 
 __all__ = ['BeneficiaryListResource', 'BeneficiaryGetResource',
            'BeneficiaryCreateResource', 'BeneficiaryUpdateResource',
@@ -37,13 +37,25 @@ class BeneficiaryCreateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
+        if not 'account' in data:
+            raise HTTPBadRequest(description={"account": "Account is required"})
+        account = data.pop('account')
         schema = BeneficiarySchema()
         result = schema.load(data)
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
+        accountSchema = accountSchema()
+        accountResult = accountSchema.load(account)
+        if accountResult.errors:
+            raise HTTPBadRequest(description=accountResult.errors)
         beneficiary = Beneficiary(**result.data)
         beneficiary.user = req.uid
         session.add(beneficiary)
+        session.commit()
+        account = Account(**accountResult.data)
+        session.refresh(beneficiary)
+        account.beneficiary = beneficiary.id
+        session.add(account)
         session.commit()
         result = schema.dump(beneficiary)
         resp.body = dumps({"beneficiary": result.data}, cls=DateTimeEncoder)
