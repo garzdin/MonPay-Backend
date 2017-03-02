@@ -44,7 +44,7 @@ class BeneficiaryCreateResource(object):
         result = schema.load(data)
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
-        accountSchema = accountSchema()
+        accountSchema = AccountSchema()
         accountResult = accountSchema.load(account)
         if accountResult.errors:
             raise HTTPBadRequest(description=accountResult.errors)
