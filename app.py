@@ -6,6 +6,7 @@ from controllers.beneficiary import *
 from controllers.transaction import *
 from controllers.account import *
 from controllers.currency import *
+from controllers.conversion import *
 
 __all__ = ['app']
 
@@ -37,3 +38,4 @@ app.add_route('/api/v1/transaction', TransactionListResource())
 app.add_route('/api/v1/transaction/{id}', TransactionGetResource())
 app.add_route('/api/v1/transaction/create', TransactionCreateResource())
 app.add_route('/api/v1/transaction/delete', TransactionDeleteResource())
+app.add_route('/api/v1/convert', ConversionResource())

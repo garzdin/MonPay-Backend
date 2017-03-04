@@ -1,5 +1,5 @@
-from json import load, dumps
-from falcon import HTTPBadRequest, HTTPNotFound, before
+from json import dumps
+from falcon import HTTPNotFound, before
 from middleware.token import validate_token
 from encoders.datetime import DateTimeEncoder
 from models.models import Currency, session
