@@ -95,7 +95,7 @@ class Account(Base, Id, Version):
 
     iban = Column(String, nullable=False)
     bic_swift = Column(String)
-    currency = Column(String)
+    currency = relationship("Currency", uselist=False)
     country = Column(String)
     active = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
@@ -113,12 +113,21 @@ def account_before_update(mapper, connection, target):
     target.version += 1
 
 
+class Currency(Base, Id, Version):
+    __tablename__ = 'currencies'
+
+    iso_code = Column(String(3), nullable=False)
+    dispay_name = Column(String)
+    account = Column(Integer, ForeignKey('accounts.id'))
+    transaction = Column(Integer, ForeignKey('transactions.id'))
+
+
 class Transaction(Base, Id, Version):
     __tablename__ = 'transactions'
 
     reference = Column(String)
     amount = Column(Float)
-    currency = Column(String)
+    currency = relationship("Currency", uselist=False)
     reason = Column(String)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
