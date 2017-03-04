@@ -9,7 +9,7 @@ from controllers.currency import *
 
 __all__ = ['app']
 
-cors = CORS(allow_origins_list=['*'])
+cors = CORS(allow_all_origins=True)
 
 app = API(middleware=[cors.middleware])
 app.add_route('/api/v1/upload/file', FileUploadResource())
