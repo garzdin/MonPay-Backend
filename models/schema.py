@@ -62,8 +62,8 @@ class AccountSchema(Schema, Id, Version):
 class CurrencySchema(Schema, Id, Version):
     iso_code = fields.Str(required=True)
     display_name = fields.Str()
-    accounts = fields.Nested('AccountSchema')
-    transactions = fields.Nested('TransactionSchema')
+    accounts = fields.Nested('AccountSchema', many=True)
+    transactions = fields.Nested('TransactionSchema', many=True)
 
 
 class TransactionSchema(Schema, Id, Version):
