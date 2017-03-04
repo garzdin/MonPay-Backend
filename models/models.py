@@ -117,7 +117,7 @@ class Currency(Base, Id, Version):
     __tablename__ = 'currencies'
 
     iso_code = Column(String(3), nullable=False)
-    dispay_name = Column(String)
+    display_name = Column(String)
     account = Column(Integer, ForeignKey('accounts.id'))
     transaction = Column(Integer, ForeignKey('transactions.id'))
 
