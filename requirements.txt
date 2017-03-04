@@ -1,4 +1,5 @@
 falcon
+falcon-cors
 sqlalchemy
 gunicorn
 psycopg2

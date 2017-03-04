@@ -1,4 +1,5 @@
 from falcon import API
+from falcon_cors import CORS
 from controllers.file import *
 from controllers.user import *
 from controllers.beneficiary import *
@@ -8,7 +9,9 @@ from controllers.currency import *
 
 __all__ = ['app']
 
-app = API()
+cors = CORS(allow_origins_list=['*'])
+
+app = API(middleware=[cors.middleware])
 app.add_route('/api/v1/upload/file', FileUploadResource())
 app.add_route('/api/v1/auth/create', UserCreateResource())
 app.add_route('/api/v1/auth/login', UserLoginResource())
