@@ -95,7 +95,7 @@ class Account(Base, Id, Version):
 
     iban = Column(String, nullable=False)
     bic_swift = Column(String)
-    currency = Column(Integer, ForeignKey('currency.id'))
+    currency = Column(Integer, ForeignKey('currencies.id'))
     country = Column(String)
     active = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
@@ -127,7 +127,7 @@ class Transaction(Base, Id, Version):
 
     reference = Column(String)
     amount = Column(Float)
-    currency = Column(Integer, ForeignKey('currency.id'))
+    currency = Column(Integer, ForeignKey('currencies.id'))
     reason = Column(String)
     completed = Column(Boolean, default=False)
     user = Column(Integer, ForeignKey('users.id'))
