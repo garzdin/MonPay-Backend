@@ -51,7 +51,7 @@ class BeneficiarySchema(Schema, Id, Entity, Phone, Identity, Version):
 class AccountSchema(Schema, Id, Version):
     iban = fields.Str(required=True)
     bic_swift = fields.Str()
-    currency = fields.Nested('CurrencySchema')
+    currency = fields.Integer()
     country = fields.Str(required=True)
     active = fields.Boolean(default=False)
     user = fields.Integer()
@@ -62,14 +62,14 @@ class AccountSchema(Schema, Id, Version):
 class CurrencySchema(Schema, Id, Version):
     iso_code = fields.Str(required=True)
     display_name = fields.Str()
-    account = fields.Integer()
-    transaction = fields.Integer()
+    accounts = fields.Nested('AccountSchema')
+    transactions = fields.Nested('TransactionSchema')
 
 
 class TransactionSchema(Schema, Id, Version):
     reference = fields.Str()
     amount = fields.Float(required=True)
-    currency = fields.Nested('CurrencySchema')
+    currency = fields.Integer()
     reason = fields.Str(required=True)
     completed = fields.Boolean(default=False)
     user = fields.Integer()
