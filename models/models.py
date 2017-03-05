@@ -139,10 +139,10 @@ def transaction_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-# @event.listens_for(Transaction, 'before_update')
-# def transaction_before_update(mapper, connection, target):
-#     target.updated_on = datetime.now()
-#     target.version += 1
+@event.listens_for(Transaction, 'before_update')
+def transaction_before_update(mapper, connection, target):
+    target.updated_on = datetime.now()
+    target.version += 1
 
 
 class Address(Base, Id, Version):
