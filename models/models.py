@@ -65,8 +65,8 @@ def user_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-@event.listens_for(User, 'before_update')
-def user_before_update(mapper, connection, target):
+@event.listens_for(User, 'after_update')
+def user_after_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -84,8 +84,8 @@ def beneficiary_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-@event.listens_for(Beneficiary, 'before_update')
-def beneficiary_before_update(mapper, connection, target):
+@event.listens_for(Beneficiary, 'after_update')
+def beneficiary_after_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -107,8 +107,8 @@ def account_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-@event.listens_for(Account, 'before_update')
-def account_before_update(mapper, connection, target):
+@event.listens_for(Account, 'after_update')
+def account_after_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -139,8 +139,8 @@ def transaction_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-@event.listens_for(Transaction, 'before_update')
-def transaction_before_update(mapper, connection, target):
+@event.listens_for(Transaction, 'after_update')
+def transaction_after_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
@@ -160,8 +160,8 @@ def address_before_insert(mapper, connection, target):
     target.created_on = datetime.now()
     target.version = 1
 
-@event.listens_for(Address, 'before_update')
-def address_before_update(mapper, connection, target):
+@event.listens_for(Address, 'after_update')
+def address_after_update(mapper, connection, target):
     target.updated_on = datetime.now()
     target.version += 1
 
