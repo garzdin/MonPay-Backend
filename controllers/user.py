@@ -167,6 +167,7 @@ class UserAddressResource(object):
         result = schema.dump(address)
         resp.body = dumps({"address": result.data}, cls=DateTimeEncoder)
 
+    @before(validate_token)
     def on_put(self, req, resp):
         try:
             data = load(req.bounded_stream)
