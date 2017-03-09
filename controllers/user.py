@@ -136,12 +136,12 @@ class UserUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
-        user = session.query(User).filter(User.id == req.uid)
-        schema = UserSchema(exclude=('password', 'entity_type', 'email', 'first_name', 'last_name', 'date_of_birth'))
+        schema = UserSchema(exclude=('password', 'entity_type', 'date_of_birth'))
         result = schema.load(data)
         if result.errors:
             raise HTTPBadRequest(description=result.errors)
-        user.update(result.data)
+        session.query(User).filter(User.id == req.uid).update(result.data)
+        session.commit()
         schema = UserSchema(exclude=('password',))
         result = schema.dump(user.first())
         resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
@@ -164,4 +164,20 @@ class UserAddressResource(object):
         session.add(address)
         session.commit()
         result = schema.dump(address)
-        resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
+        resp.body = dumps({"address": result.data}, cls=DateTimeEncoder)
+
+    def on_put(self, req, resp):
+        try:
+            data = load(req.bounded_stream)
+        except ValueError:
+            raise HTTPBadRequest(description="Invalid request")
+        user = session.query(User).get(req.uid)
+        schema = AddressSchema()
+        result = schema.load(data)
+        if result.errors:
+            raise HTTPBadRequest(description=result.errors)
+        session.query(Address).filter(Address.id == user.address.id).update(result.data)
+        session.commit()
+        address = user.address
+        result = schema.dump(address)
+        resp.body = dumps({"address": result.data}, cls=DateTimeEncoder)
