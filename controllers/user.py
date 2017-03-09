@@ -136,6 +136,7 @@ class UserUpdateResource(object):
             data = load(req.bounded_stream)
         except ValueError:
             raise HTTPBadRequest(description="Invalid request")
+        user = session.query(User).get(req.uid)
         schema = UserSchema(exclude=('password', 'entity_type', 'date_of_birth'))
         result = schema.load(data)
         if result.errors:
@@ -143,7 +144,7 @@ class UserUpdateResource(object):
         session.query(User).filter(User.id == req.uid).update(result.data)
         session.commit()
         schema = UserSchema(exclude=('password',))
-        result = schema.dump(user.first())
+        result = schema.dump(user)
         resp.body = dumps({"user": result.data}, cls=DateTimeEncoder)
 
 
